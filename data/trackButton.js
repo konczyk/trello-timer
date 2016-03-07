@@ -8,6 +8,7 @@ const ICON = (function() {
 
 var trackStart = null;
 var button = null;
+var trackInterval = null;
 
 self.port.on("attachTrackButton", function() {
     var container = document.querySelector(".other-actions .u-clearfix");
@@ -27,13 +28,13 @@ function makeButton() {
 }
 
 function track(e) {
-    var isActive = button.classList.contains(TRACK_BUTTON_ACTIVE_CLASS);
-    if (!isActive) {
+    if (trackStart === null) {
         startTracking();
     } else {
         stopTracking();
     }
     e.stopPropagation();
+    button.blur();
 }
 
 function startTracking() {
@@ -41,10 +42,12 @@ function startTracking() {
     button.classList.add(TRACK_BUTTON_ACTIVE_CLASS);
     emptyNode(button);
     button.appendChild(document.createTextNode("00:00:00"));
+    trackInterval = setInterval(tick, 1000);
 }
 
 function stopTracking() {
     self.port.emit("trackingStopped", trackStart, new Date());
+    clearInterval(trackInterval);
     trackStart = null;
     button.classList.remove(TRACK_BUTTON_ACTIVE_CLASS);
     emptyNode(button);
@@ -56,4 +59,15 @@ function emptyNode(node) {
     while (node.firstChild) {
         node.removeChild(node.firstChild);
     }
+}
+
+function tick() {
+    var diff = (new Date() - trackStart) / 1000;
+    var h = Math.floor(diff / 3600) % 24;
+    var m = Math.floor((diff - h*3600) / 60) % 60;
+    var s = Math.floor((diff - h*3600 - m*60) % 60);
+    button.textContent =
+        (h <= 9 ? "0" : "") + h + ":" +
+        (m <= 9 ? "0" : "") + m + ":" +
+        (s <= 9 ? "0" : "") + s;
 }

@@ -1,7 +1,12 @@
-.tt-active {
+.tt-active, .tt-active:hover {
     text-align: center;
     color: white;
     background: #d9534f;
     border-color: #d9534f;
     border-bottom-color: #a74a47;
+}
+
+.tt-active:hover {
+    background: #d4413e;
+    border-color: #d4413e;
 }
