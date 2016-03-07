@@ -14,13 +14,19 @@ function getCardId() {
 PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
+        "./utils.js",
         "./listeners.js",
         "./trackButton.js",
+        "./comments.js",
     ],
     contentStyleFile: "./style.css",
     onAttach: function(worker) {
         worker.port.on("cardOpen", function() {
             worker.port.emit("attachTrackButton", null);
         });
+        worker.port.on("timerStop", function(times) {
+            worker.port.emit("addTimeComment", times);
+        });
+
     }
 });

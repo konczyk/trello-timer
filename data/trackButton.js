@@ -42,11 +42,13 @@ function startTracking() {
     button.classList.add(TRACK_BUTTON_ACTIVE_CLASS);
     emptyNode(button);
     button.appendChild(document.createTextNode("00:00:00"));
-    trackInterval = setInterval(tick, 1000);
+    trackInterval = setInterval(function() {
+        button.textContent = intervalToClock(trackStart, new Date());
+    }, 1000);
 }
 
 function stopTracking() {
-    self.port.emit("trackingStopped", trackStart, new Date());
+    self.port.emit("timerStop", {start: trackStart, end: new Date()});
     clearInterval(trackInterval);
     trackStart = null;
     button.classList.remove(TRACK_BUTTON_ACTIVE_CLASS);
@@ -59,15 +61,4 @@ function emptyNode(node) {
     while (node.firstChild) {
         node.removeChild(node.firstChild);
     }
-}
-
-function tick() {
-    var diff = (new Date() - trackStart) / 1000;
-    var h = Math.floor(diff / 3600) % 24;
-    var m = Math.floor((diff - h*3600) / 60) % 60;
-    var s = Math.floor((diff - h*3600 - m*60) % 60);
-    button.textContent =
-        (h <= 9 ? "0" : "") + h + ":" +
-        (m <= 9 ? "0" : "") + m + ":" +
-        (s <= 9 ? "0" : "") + s;
 }
