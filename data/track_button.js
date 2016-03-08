@@ -94,7 +94,7 @@ function stopTracking() {
     trackStart = null;
     button.classList.remove(TRACK_BUTTON_ACTIVE_CLASS);
     emptyNode(button);
-    button.appendChild(ICON.cloneNode());
+    button.appendChild(CLOCK_ICON.cloneNode());
     button.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
 }
 
