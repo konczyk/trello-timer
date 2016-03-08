@@ -1,5 +1,6 @@
 const TRACK_BUTTON_TEXT = " Track time";
 const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
+const CALENDAR_CLOCK_MATCHER = ".window-sidebar .icon-clock";
 const ICON = (function() {
     var icon = document.createElement("span");
     icon.classList.add("icon-sm", "icon-clock");
@@ -42,8 +43,15 @@ function makeButton() {
     node.setAttribute("href", "#");
     node.appendChild(ICON.cloneNode());
     node.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
+    swapIcons();
 
     return node;
+}
+
+function swapIcons() {
+    var calendar = document.querySelector(CALENDAR_CLOCK_MATCHER);
+    calendar.classList.remove("icon-clock");
+    calendar.classList.add("icon-calendar");
 }
 
 function findInterruptedTime() {
