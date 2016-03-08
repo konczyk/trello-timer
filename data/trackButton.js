@@ -9,22 +9,58 @@ const ICON = (function() {
 var trackStart = null;
 var button = null;
 var trackInterval = null;
+var card = null;
+var interruptedTimers = [];
 
-self.port.on("attachTrackButton", function() {
+self.port.on("attachTrackButton", function(cardId) {
+    card = cardId;
     var container = document.querySelector(".other-actions .u-clearfix");
     button = makeButton();
     container.insertBefore(button, container.firstChild);
+    if (oldTime = findInterruptedTime()) {
+        startTracking(oldTime);
+    }
+});
+
+self.port.on("cleanTrackButton", function() {
+    if (trackStart !== null) {
+        interruptedTimers.push({
+            "card": card,
+            "time": trackStart
+        });
+        trackStart = null;
+        card = null;
+        button = null;
+        clearInterval(trackInterval);
+    }
 });
 
 function makeButton() {
     var node = document.createElement("a");
+    node.addEventListener("click", track);
     node.classList.add("button-link");
     node.setAttribute("href", "#");
     node.appendChild(ICON.cloneNode());
     node.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
-    node.addEventListener("click", track);
 
     return node;
+}
+
+function findInterruptedTime() {
+    var time = null;
+    var idx = null;
+    for (var i = 0; i < interruptedTimers.length; i++) {
+        if (interruptedTimers[i].card === card) {
+            time = interruptedTimers[i].time;
+            idx = i;
+            break;
+        }
+    }
+    if (idx !== null) {
+        interruptedTimers.splice(idx, 1);
+    }
+
+    return time;
 }
 
 function track(e) {
@@ -37,11 +73,13 @@ function track(e) {
     button.blur();
 }
 
-function startTracking() {
-    trackStart = new Date();
+function startTracking(time) {
+    trackStart = time || new Date();
     button.classList.add(TRACK_BUTTON_ACTIVE_CLASS);
     emptyNode(button);
-    button.appendChild(document.createTextNode("00:00:00"));
+    button.appendChild(document.createTextNode(
+        intervalToClock(trackStart, new Date())
+    ));
     trackInterval = setInterval(function() {
         button.textContent = intervalToClock(trackStart, new Date());
     }, 1000);

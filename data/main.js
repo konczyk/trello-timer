@@ -17,17 +17,23 @@ PageMod({
     contentScriptFile: [
         "./utils.js",
         "./listeners.js",
+        "./card.js",
         "./trackButton.js",
         "./comments.js",
     ],
     contentStyleFile: "./style.css",
     onAttach: function(worker) {
         worker.port.on("cardOpen", function() {
-            worker.port.emit("attachTrackButton", null);
+            worker.port.emit("attachTrackButton", getCardId());
+            worker.port.emit("attachCardListeners", null);
         });
         worker.port.on("timerStop", function(times) {
             worker.port.emit("addTimeComment", times);
             addTimer(getCardId(), times.start, times.end);
+        });
+        worker.port.on("cardClose", function() {
+            worker.port.emit("cleanTrackButton", null);
+            worker.port.emit("enableCardListener", null);
         });
     }
 });
