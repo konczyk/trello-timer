@@ -49,20 +49,27 @@ function boardReadyListener(mutation) {
             document.querySelector(CARDS_SELECTOR) !== null) {
         console.log("matching mutation: boardReady");
         self.port.emit("boardReady", null);
-        return false;
     }
 
     return true;
 }
 
-self.port.on("attachObservers", attachObservers);
-
-self.port.on("enableCardOpenListener", function() {
+function enableListener(cb) {
     for (var i = 0, len = listeners.length; i < len; i++) {
-        if (listeners[i].callback === cardOpenListener) {
-            console.log("enabled mutation: cardOpen");
+        if (listeners[i].callback === cb) {
+            console.log("enabled mutation: " + cb);
             listeners[i].active = true;
             return;
         }
     }
+}
+
+self.port.on("attachObservers", attachObservers);
+
+self.port.on("enableCardOpenListener", function() {
+    enableListener(cardOpenListener);
+});
+
+self.port.on("enableBoardReadyListener", function() {
+    enableListener(BoardReadyListener);
 });
