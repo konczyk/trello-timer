@@ -9,5 +9,5 @@ self.port.on("addTimeComment", function(times) {
     submit.removeAttribute("disabled");
     setTimeout(function() {
         submit.click();
-    }, 10);
+    }, 20);
 });
