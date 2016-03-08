@@ -13,8 +13,8 @@ var trackInterval = null;
 var card = null;
 var interruptedTimers = [];
 
-self.port.on("attachTrackButton", function(cardId) {
-    card = cardId;
+self.port.on("attachTrackButton", function() {
+    card = getCardIdFromURL();
     var container = document.querySelector(".other-actions .u-clearfix");
     button = makeButton();
     container.insertBefore(button, container.firstChild);
@@ -94,7 +94,11 @@ function startTracking(time) {
 }
 
 function stopTracking() {
-    self.port.emit("timerStop", {start: trackStart, end: new Date()});
+    self.port.emit("timerStop", {
+        card: getCardIdFromURL(),
+        start: trackStart,
+        end: new Date()
+    });
     clearInterval(trackInterval);
     trackStart = null;
     button.classList.remove(TRACK_BUTTON_ACTIVE_CLASS);

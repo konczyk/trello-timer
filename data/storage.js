@@ -23,21 +23,16 @@ idb.onupgradeneeded = function(e) {
     }
 }
 
-function saveTimer(cardId, startTime, endTime) {
-    var item = {
-        "card": cardId,
-        "start": startTime,
-        "end": endTime
-    };
+function saveTimer(timer) {
     var trans = db.transaction(["timers"], "readwrite");
     trans.oncomplete = function() {
         console.log("transaction completed");
     }
     trans.onerror = idb.onerror;
 
-    var request = trans.objectStore("timers").add(item);
+    var request = trans.objectStore("timers").add(timer);
     request.onsuccess = function(e) {
-        console.log("Stored new timer: " + JSON.stringify(item));
+        console.log("Stored new timer: " + JSON.stringify(timer));
     }
 }
 

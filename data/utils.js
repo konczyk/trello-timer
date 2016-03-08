@@ -13,3 +13,12 @@ function intervalToMinClock(diff) {
 
     return h.toFixed(1);
 }
+
+function getCardIdFromURL() {
+    var path = window.location.pathname;
+    if (!path.match(/^\/c\/[A-Za-z0-9]{8,}\/.*$/)) {
+        console.error("not a card path: " + path);
+    }
+
+    return path.split("/")[2];
+}
