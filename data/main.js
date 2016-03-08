@@ -18,7 +18,7 @@ PageMod({
         "./utils.js",
         "./observers.js",
         "./card.js",
-        "./trackButton.js",
+        "./track_button.js",
         "./comments.js",
     ],
     contentStyleFile: "./style.css",
