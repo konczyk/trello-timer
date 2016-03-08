@@ -4,6 +4,7 @@ var {saveTimer, getTimersPerCard} = require("./storage");
 PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
+        "./const.js",
         "./utils.js",
         "./observers.js",
         "./board.js",

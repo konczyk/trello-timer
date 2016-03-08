@@ -1,12 +1,3 @@
-const TRACK_BUTTON_TEXT = " Track time";
-const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
-const CALENDAR_CLOCK_MATCHER = ".window-sidebar .icon-clock";
-const ICON = (function() {
-    var icon = document.createElement("span");
-    icon.classList.add("icon-sm", "icon-clock");
-    return icon;
-})();
-
 var trackStart = null;
 var button = null;
 var trackInterval = null;
@@ -15,7 +6,7 @@ var interruptedTimers = [];
 
 self.port.on("attachTrackButton", function() {
     card = getCardIdFromURL();
-    var container = document.querySelector(".other-actions .u-clearfix");
+    var container = document.querySelector(ACTIONS_SELECTOR);
     button = makeButton();
     container.insertBefore(button, container.firstChild);
     if (oldTime = findInterruptedTime()) {
@@ -41,7 +32,7 @@ function makeButton() {
     node.addEventListener("click", track);
     node.classList.add("button-link");
     node.setAttribute("href", "#");
-    node.appendChild(ICON.cloneNode());
+    node.appendChild(CLOCK_ICON.cloneNode());
     node.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
     swapIcons();
 
@@ -49,7 +40,7 @@ function makeButton() {
 }
 
 function swapIcons() {
-    var calendar = document.querySelector(CALENDAR_CLOCK_MATCHER);
+    var calendar = document.querySelector(DUE_DATE_ICON_SELECTOR);
     calendar.classList.remove("icon-clock");
     calendar.classList.add("icon-calendar");
 }

@@ -1,7 +1,3 @@
-const WINDOW_MATCHER = ".window-wrapper";
-const SIDEBAR_MATCHER = WINDOW_MATCHER + " .window-sidebar";
-const COMMENT_BUTTON_MATCH = ".new-comment .confirm";
-
 var listeners = [
     {
         active: true,
@@ -20,7 +16,7 @@ var observer = new MutationObserver(function(mutations) {
 });
 
 observer.observe(
-    document.querySelector(WINDOW_MATCHER),
+    document.querySelector(WINDOW_SELECTOR),
     {
         childList: true
     }
@@ -28,7 +24,7 @@ observer.observe(
 
 function cardOpenListener(mutation) {
     if (mutation.addedNodes.length > 0 &&
-            document.querySelector(SIDEBAR_MATCHER) !== null) {
+            document.querySelector(SIDEBAR_SELECTOR) !== null) {
         self.port.emit("cardOpen", null);
         return false;
     }

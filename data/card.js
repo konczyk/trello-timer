@@ -1,13 +1,13 @@
 self.port.on("attachCardListeners", function() {
-    var close = document.querySelector(".window-wrapper .dialog-close-button");
-    var overlay = document.querySelector(".window-overlay");
+    var close = document.querySelector(CLOSE_CARD_SELECTOR);
+    var overlay = document.querySelector(OVERLAY_SELECTOR);
 
     close.addEventListener("click", function() {
         self.port.emit("cardClose", null);
     });
 
     overlay.addEventListener("click", function() {
-        if (document.querySelector(".card-detail-window") === null) {
+        if (document.querySelector(CARD_WINDOW_SELECTOR) === null) {
             self.port.emit("cardClose", null);
         }
     });

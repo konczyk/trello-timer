@@ -1,22 +1,9 @@
-const BADGE = (function() {
-    var b = document.createElement("div");
-    b.classList.add("badge");
-    b.setAttribute("title", "time");
-    var icon = document.createElement("span");
-    icon.classList.add("badge-icon", "icon-sm", "icon-clock");
-    b.appendChild(icon);
-    var t = document.createElement("span");
-    t.classList.add("badge-text");
-    b.appendChild(t);
-    return b;
-})();
-
 self.port.on("updateLists", function(timers) {
-    var lists = document.querySelectorAll(".list-cards");
+    var lists = document.querySelectorAll(CARDS_SELECTOR);
     for (var i = 0; i < lists.length; i++) {
         var listTotal = 0;
         var listToday = 0;
-        var badges = lists[i].querySelectorAll(".badges");
+        var badges = lists[i].querySelectorAll(BADGES_SELECTOR);
         for (var j = 0; j < badges.length; j++) {
             var newBadge = BADGE.cloneNode(true);
             var card = getCardIfForBadges(badges[j]);
@@ -28,15 +15,14 @@ self.port.on("updateLists", function(timers) {
             }
             listTotal += total;
             listToday += today;
-            newBadge.querySelector(".badge-text")
+            newBadge.querySelector(BADGE_TEXT_SELECTOR)
                 .appendChild(toHoursNode(today, total));
             badges[j].appendChild(newBadge);
         }
         var el = document.createElement("span");
         el.classList.add("tt-list-total");
         el.appendChild(toHoursNode(listToday, listTotal));
-        var dd = lists[i].parentNode
-                    .querySelector(".list-header .icon-dropdown-menu");
+        var dd = lists[i].parentNode.querySelector(HEADER_ICON_SELECTOR);
         dd.parentNode.insertBefore(el, dd);
     }
 });
