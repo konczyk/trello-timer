@@ -1,6 +1,7 @@
 var {PageMod} = require("sdk/page-mod");
 var {activeTab} = require("sdk/tabs");
 var {URL} = require("sdk/url");
+var {addTimer} = require("./storage");
 
 function getCardId() {
     var path = URL(activeTab.url).path;
@@ -26,7 +27,7 @@ PageMod({
         });
         worker.port.on("timerStop", function(times) {
             worker.port.emit("addTimeComment", times);
+            addTimer(getCardId(), times.start, times.end);
         });
-
     }
 });
