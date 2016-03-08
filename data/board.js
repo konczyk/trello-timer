@@ -1,4 +1,4 @@
-self.port.on("updateLists", function(timers) {
+self.port.on("initLists", function(timers) {
     var lists = document.querySelectorAll(CARDS_SELECTOR);
     for (var i = 0; i < lists.length; i++) {
         var listTotal = 0;

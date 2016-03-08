@@ -1,5 +1,6 @@
 // window/board related
 const OVERLAY_SELECTOR          = ".window-overlay";
+const BOARD_SELECTOR            = "#content";
 const WINDOW_SELECTOR           = ".window-wrapper";
 const CARDS_SELECTOR            = ".list-cards";
 const BADGES_SELECTOR           = ".badges";

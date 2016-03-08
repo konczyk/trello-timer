@@ -13,9 +13,13 @@ PageMod({
         "./comments.js",
     ],
     contentStyleFile: "./style.css",
+    contentScriptWhen: "ready",
     onAttach: function(worker) {
-        getTimersPerCard(function(timers) {
-            worker.port.emit("updateLists", timers);
+        worker.port.emit("attachObservers", null);
+        worker.port.on("boardReady", function() {
+            getTimersPerCard(function(timers) {
+                worker.port.emit("initLists", timers);
+            });
         });
         worker.port.on("cardOpen", function() {
             worker.port.emit("attachTrackButton", null);
@@ -27,7 +31,7 @@ PageMod({
         });
         worker.port.on("cardClose", function() {
             worker.port.emit("cleanTrackButton", null);
-            worker.port.emit("enableCardListener", null);
+            worker.port.emit("enableCardOpenListener", null);
         });
     }
 });
