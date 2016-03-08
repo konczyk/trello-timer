@@ -7,3 +7,9 @@ function intervalToClock(startTime, endTime) {
            (m <= 9 ? "0" : "") + m + ":" +
            (s <= 9 ? "0" : "") + s;
 }
+
+function intervalToMinClock(diff) {
+    var h = parseFloat(diff / 1000 / 3600) % 24;
+
+    return h.toFixed(1);
+}

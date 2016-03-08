@@ -10,3 +10,9 @@
     background: #d4413e;
     border-color: #d4413e;
 }
+
+.tt-list-total {
+    float: right; 
+    color: gray; 
+    font-size: 13px;
+}

@@ -23,7 +23,7 @@ idb.onupgradeneeded = function(e) {
     }
 }
 
-function addTimer(cardId, startTime, endTime) {
+function saveTimer(cardId, startTime, endTime) {
     var item = {
         "card": cardId,
         "start": startTime,
@@ -41,4 +41,47 @@ function addTimer(cardId, startTime, endTime) {
     }
 }
 
-exports.addTimer = addTimer;
+function getTimersPerCard(callback) {
+    var trans = db.transaction(["timers"], "readwrite");
+    var store = trans.objectStore("timers");
+    var items = {};
+
+    trans.oncomplete = function() {
+        console.log("getTimesPerCard: transaction completed");
+        callback(items);
+    }
+    trans.onerror = idb.onerror;
+
+    var keyRange = IDBKeyRange.lowerBound(0);
+    var cursorRequest = store.openCursor(keyRange);
+    cursorRequest.onerror = idb.onerror;
+
+    cursorRequest.onsuccess = function(e) {
+        var result = e.target.result;
+        if(!!result == false) {
+            return;
+        }
+
+        var card = result.value.card;
+        var start = new Date(result.value.start);
+        var end = new Date(result.value.end);
+        var time = parseInt(end - start, 10) / 1000;
+        if (!items[card]) {
+            items[card] = {
+                total: time,
+                today: 0
+            }
+        } else {
+            items[card].total += time;
+        }
+
+        if (start.toDateString() === new Date().toDateString()) {
+            items[card].today += time;
+        }
+
+        result.continue();
+    }
+}
+
+exports.saveTimer = saveTimer;
+exports.getTimersPerCard = getTimersPerCard;
