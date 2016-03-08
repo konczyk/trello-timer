@@ -1,5 +1,6 @@
 const WINDOW_MATCHER = ".window-wrapper";
 const SIDEBAR_MATCHER = WINDOW_MATCHER + " .window-sidebar";
+const COMMENT_BUTTON_MATCH = ".new-comment .confirm";
 
 var listeners = [
     {
@@ -19,7 +20,7 @@ var observer = new MutationObserver(function(mutations) {
 });
 
 observer.observe(
-    document.querySelector('.window-wrapper'),
+    document.querySelector(WINDOW_MATCHER),
     {
         childList: true
     }
