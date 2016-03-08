@@ -16,7 +16,7 @@ PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
         "./utils.js",
-        "./listeners.js",
+        "./observers.js",
         "./card.js",
         "./trackButton.js",
         "./comments.js",
