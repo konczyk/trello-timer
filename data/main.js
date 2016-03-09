@@ -20,7 +20,12 @@ PageMod({
         worker.port.emit("attachObservers", null);
         worker.port.on("boardReady", function() {
             getTimersPerCard(function(timers) {
-                worker.port.emit("initLists", timers);
+                worker.port.emit("syncLists", timers);
+            });
+        });
+        worker.port.on("cardDrop", function() {
+            getTimersPerCard(function(timers) {
+                worker.port.emit("syncLists", timers);
             });
         });
         worker.port.on("cardOpen", function() {

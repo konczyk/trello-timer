@@ -8,6 +8,11 @@ var listeners = [
         active: true,
         target: BOARD_SELECTOR,
         callback: boardReadyListener
+    },
+    {
+        active: true,
+        target: "body",
+        callback: cardDragListener
     }
 ]
 
@@ -19,6 +24,8 @@ function attachObservers() {
     observer.observe(document.querySelector(WINDOW_SELECTOR),
                      {childList: true});
     observer.observe(document.querySelector(BOARD_SELECTOR),
+                     {childList: true});
+    observer.observe(document.querySelector("body"),
                      {childList: true});
 
     runListeners();
@@ -53,6 +60,17 @@ function boardReadyListener(mutation) {
 
     return true;
 }
+
+function cardDragListener(mutation) {
+    if (mutation && mutation.removedNodes.length > 0 &&
+            document.querySelector(DND_SELECTOR) === null) {
+        console.log("matching mutation: cardDrop");
+        self.port.emit("cardDrop", null);
+    }
+
+    return true;
+}
+
 
 function enableListener(cb) {
     for (var i = 0, len = listeners.length; i < len; i++) {

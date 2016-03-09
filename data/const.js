@@ -9,17 +9,19 @@ const DUE_PAST_CLASS            = "is-due-past";
 const CARD_COMPLETE_CLASS       = "tt-card-complete";
 const LIST_TOTAL_CLASS          = "tt-list-total";
 const HIDE_CLASS                = "tt-hide";
+const TIME_BADGE_CLASS          = "timer-badge";
 
 // window/board related
 const OVERLAY_SELECTOR          = ".window-overlay";
 const BOARD_SELECTOR            = "#content";
+const DND_SELECTOR              = "body > .list-card";
 const WINDOW_SELECTOR           = ".window-wrapper";
 const CARD_LIST_SELECTOR        = ".list";
 const CARD_SELECTOR             = ".list-card-details";
 const CARD_URL_SELECTOR         = ".list-card-title";
 const BADGES_SELECTOR           = ".badges";
 const BADGE_TEXT_SELECTOR       = ".badge-text";
-const TIMER_BADGE_SELECTOR      = ".timer-badge";
+const TIMER_BADGE_SELECTOR      = "." + TIME_BADGE_CLASS;
 const DESC_ICON_SELECTOR        = ".icon-description";
 const COMMENT_ICON_SELECTOR     = ".icon-comment";
 const CLOCK_ICON_SELECTOR       = "." + CLOCK_ICON_CLASS;
