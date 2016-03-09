@@ -16,3 +16,7 @@
     color: gray; 
     font-size: 13px;
 }
+
+.tt-hide {
+    display: none;
+}

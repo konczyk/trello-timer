@@ -40,5 +40,9 @@ PageMod({
             worker.port.emit("toggleTimerBadges",
                              prefSet.prefs["timer_badge_position"]);
         });
+        prefSet.on("hide_desc_badge", function() {
+            worker.port.emit("toggleDescBadges",
+                             prefSet.prefs["hide_desc_badge"]);
+        });
     }
 });

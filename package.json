@@ -26,6 +26,12 @@
           "label": "Last"
         }
       ]
+    },
+    {
+      "name": "hide_desc_badge",
+      "title": "Hide description icon",
+      "type": "bool",
+      "value": false
     }
   ]
 }

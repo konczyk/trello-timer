@@ -8,9 +8,10 @@ const CARD_URL_SELECTOR         = ".list-card-title";
 const BADGES_SELECTOR           = ".badges";
 const BADGE_TEXT_SELECTOR       = ".badge-text";
 const TIMER_BADGE_SELECTOR      = ".timer-badge";
+const DESC_ICON_SELECTOR        = ".icon-description";
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
 
-// card related
+// open card related
 const CARD_WINDOW_SELECTOR      = ".card-detail-window";
 const SIDEBAR_SELECTOR          = ".window-wrapper .window-sidebar";
 const CLOSE_CARD_SELECTOR       = ".window-wrapper .dialog-close-button";

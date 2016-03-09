@@ -2,12 +2,14 @@ const TIME_ICON_POSITION_FIRST = 0;
 const TIME_ICON_POSITION_LAST = 1;
 
 var timerBadgePosition = self.options.timer_data_position;
+var descBadgeVisibility = self.options.hide_desc_badge;
 
 self.port.on("initLists", function(timers) {
     var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
     for (let i = 0; i < lists.length; i++) {
         let map = getCardsMap(lists[i]);
         addTimerBadges(map, timers);
+        toggleCard(toggleDescBadge);
 
         let header = lists[i].querySelector(HEADER_ICON_SELECTOR);
         header.parentNode.insertBefore(createListHeader(map, timers), header);
@@ -18,6 +20,12 @@ self.port.on("toggleTimerBadges", function(newValue) {
     timerBadgePosition = newValue;
     toggleCard(toggleTimerBadge);
 });
+
+self.port.on("toggleDescBadges", function(newValue) {
+    descBadgeVisibility = newValue;
+    toggleCard(toggleDescBadge);
+});
+
 
 function toggleCard(callback) {
     var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
@@ -63,6 +71,14 @@ function toggleTimerBadge(cardNode, newBadge) {
         index = badgeContainer.childNodes.length - 1;
     }
     badgeContainer.insertBefore(badgeNode, badgeContainer.childNodes[index]);
+}
+
+function toggleDescBadge(cardNode) {
+    var descIcon = cardNode.querySelector(DESC_ICON_SELECTOR);
+    if (descIcon) {
+        console.log(descBadgeVisibility);
+        descIcon.parentNode.classList.toggle("tt-hide", descBadgeVisibility);
+    }
 }
 
 function formatHours(today, total) {
