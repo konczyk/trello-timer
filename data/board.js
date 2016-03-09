@@ -199,20 +199,6 @@ function toggleCommentBadge(cardNode) {
     }
 }
 
-function formatHours(today, total) {
-    return document.createTextNode(
-        toHours(today) + " [" + toHours(total) + "]"
-    );
-}
-
-function formatTotalHours(today, total) {
-    return document.createTextNode(toHours(total));
-}
-
-function formatTodayHours(today, total) {
-    return document.createTextNode(toHours(today));
-}
-
 function getCardsMap(listContainer) {
     var map = new Map();
     var cards = listContainer.querySelectorAll(CARD_SELECTOR);
@@ -239,8 +225,4 @@ function extractCardId(badgeContainer) {
     }
 
     return parser.pathname.split("/")[2];
-}
-
-function toHours(time) {
-    return ((time / 3600) % 24).toFixed(1);
 }

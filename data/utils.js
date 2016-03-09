@@ -22,3 +22,21 @@ function getCardIdFromURL() {
 
     return path.split("/")[2];
 }
+
+function toHours(time) {
+    return ((time / 3600) % 24).toFixed(1);
+}
+
+function formatHours(today, total) {
+    return document.createTextNode(
+        toHours(today) + " [" + toHours(total) + "]"
+    );
+}
+
+function formatTotalHours(today, total) {
+    return document.createTextNode(toHours(total));
+}
+
+function formatTodayHours(today, total) {
+    return document.createTextNode(toHours(today));
+}

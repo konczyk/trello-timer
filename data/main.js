@@ -17,28 +17,32 @@ PageMod({
     contentScriptWhen: "ready",
     contentScriptOptions: prefs,
     onAttach: function(worker) {
+
+        function sync() {
+            getTimersPerCard(function(timers) {
+                worker.port.emit("syncLists", timers);
+            });
+        }
+
         worker.port.emit("attachObservers", null);
-        worker.port.on("boardReady", function() {
-            getTimersPerCard(function(timers) {
-                worker.port.emit("syncLists", timers);
-            });
-        });
-        worker.port.on("cardDrop", function() {
-            getTimersPerCard(function(timers) {
-                worker.port.emit("syncLists", timers);
-            });
-        });
+
+        worker.port.on("boardReady", sync);
+        worker.port.on("cardDrop", sync);
+
         worker.port.on("cardOpen", function() {
             worker.port.emit("attachTrackButton", null);
             worker.port.emit("attachCardListeners", null);
         });
+
         worker.port.on("timerStop", function(timer) {
             worker.port.emit("addTimeComment", timer);
             saveTimer(timer);
         });
+
         worker.port.on("cardClose", function() {
             worker.port.emit("cleanTrackButton", null);
             worker.port.emit("enableCardOpenListener", null);
+            sync();
         });
 
         // preferences changed
