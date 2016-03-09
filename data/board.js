@@ -16,6 +16,13 @@ var options = {
         "value": self.options.hide_comment_badge,
         "handler": toggleCommentBadge,
         "init": true
+    },
+    "enable_completed_card": {
+        "value": self.options.enable_completed_card,
+        "handler": toggleCompletedCard,
+        "init": true,
+        "default_formatter": formatHours,
+        "complete_formatter": formatTotalHours
     }
 };
 
@@ -25,14 +32,14 @@ self.port.on("initLists", function(timers) {
         let map = getCardsMap(lists[i]);
         switchDueDateIcons(lists[i]);
         addTimerBadges(map, timers);
-        Object.keys(options).forEach(function(key) {
-            if (options[key].init) {
-                toggleCard(options[key].handler);
-            }
-        });
         let header = lists[i].querySelector(HEADER_ICON_SELECTOR);
         header.parentNode.insertBefore(createListHeader(map, timers), header);
     }
+    Object.keys(options).forEach(function(key) {
+        if (options[key].init) {
+            toggleCard(options[key].handler);
+        }
+    });
 });
 
 self.port.on("toggleCards", function(change) {
@@ -74,6 +81,8 @@ function addTimerBadges(cardMap, timers) {
         newBadge.querySelector(BADGE_TEXT_SELECTOR)
             .appendChild(formatHours(today, total));
         toggleTimerBadge(cardNode, newBadge);
+        newBadge.dataset.today = today;
+        newBadge.dataset.total = total;
     })
 }
 
@@ -104,6 +113,38 @@ function toggleDescBadge(cardNode) {
     }
 }
 
+function toggleCompletedCard(cardNode) {
+    var enabled = options["enable_completed_card"].value;
+    var ckIcon = cardNode.querySelector(CHECKLIST_ICON_SELECTOR);
+    var calIcon = cardNode.querySelector(DUE_DATE_ICON_SELECTOR);
+    var timer = cardNode.querySelector(TIMER_BADGE_SELECTOR);
+    var timerText = timer.querySelector(BADGE_TEXT_SELECTOR);
+    var cardComplete = cardNode.classList.contains(CARD_COMPLETE_CLASS);
+
+    if (!ckIcon || !calIcon || !enabled) {
+        enabled = false;
+    } else {
+        let checklist = ckIcon.parentNode.classList.contains(COMPLETE_CLASS);
+        let due_date = calIcon.parentNode.classList.contains(DUE_NOW_CLASS) ||
+                       calIcon.parentNode.classList.contains(DUE_PAST_CLASS);
+        enabled = checklist && due_date;
+    }
+
+    if (enabled && !cardComplete) {
+        let formatter = options.enable_completed_card.complete_formatter;
+        let newTime = formatter(timer.dataset.today, timer.dataset.total);
+        cardNode.classList.add(CARD_COMPLETE_CLASS);
+        timerText.replaceChild(newTime, timerText.firstChild);
+    }
+
+    if (!enabled && cardComplete) {
+        let formatter = options.enable_completed_card.default_formatter;
+        let newTime = formatter(timer.dataset.today, timer.dataset.total);
+        cardNode.classList.remove(CARD_COMPLETE_CLASS);
+        timerText.replaceChild(newTime, timerText.firstChild);
+    }
+}
+
 function toggleCommentBadge(cardNode) {
     var icon = cardNode.querySelector(COMMENT_ICON_SELECTOR);
     if (icon) {
@@ -116,6 +157,14 @@ function formatHours(today, total) {
     return document.createTextNode(
         toHours(today) + " [" + toHours(total) + "]"
     );
+}
+
+function formatTotalHours(today, total) {
+    return document.createTextNode(toHours(total));
+}
+
+function formatTodayHours(today, total) {
+    return document.createTextNode(toHours(today));
 }
 
 function getCardsMap(listContainer) {

@@ -2,6 +2,11 @@ const TRACK_BUTTON_TEXT         = " Track time";
 const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
 const CLOCK_ICON_CLASS          = "icon-clock";
 const DUE_DATE_ICON_CLASS       = "icon-calendar";
+const CHECKLIST_ICON_CLASS      = "icon-checklist";
+const COMPLETE_CLASS            = "is-complete";
+const DUE_NOW_CLASS             = "is-due-now";
+const DUE_PAST_CLASS            = "is-due-past";
+const CARD_COMPLETE_CLASS       = "tt-card-complete";
 
 // window/board related
 const OVERLAY_SELECTOR          = ".window-overlay";
@@ -16,6 +21,8 @@ const TIMER_BADGE_SELECTOR      = ".timer-badge";
 const DESC_ICON_SELECTOR        = ".icon-description";
 const COMMENT_ICON_SELECTOR     = ".icon-comment";
 const CLOCK_ICON_SELECTOR       = "." + CLOCK_ICON_CLASS;
+const CHECKLIST_ICON_SELECTOR   = "." + CHECKLIST_ICON_CLASS;
+const DUE_DATE_ICON_SELECTOR    = "." + DUE_DATE_ICON_CLASS;
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
 
 // open card related
@@ -23,7 +30,6 @@ const CARD_WINDOW_SELECTOR      = ".card-detail-window";
 const SIDEBAR_SELECTOR          = ".window-wrapper .window-sidebar";
 const CLOSE_CARD_SELECTOR       = ".window-wrapper .dialog-close-button";
 const ACTIONS_SELECTOR          = ".other-actions .u-clearfix";
-const DUE_DATE_ICON_SELECTOR    = ".window-sidebar .icon-clock";
 const COMMENT_BUTTON_SELECTOR   = ".new-comment .confirm";
 const COMMENT_AREA_SELECTOR     = ".comment-box-input";
 

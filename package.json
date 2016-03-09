@@ -28,6 +28,13 @@
       ]
     },
     {
+      "name": "enable_completed_card",
+      "title": "Enable completed cards",
+      "type": "bool",
+      "value": false,
+      "description": "Completed card is past due date and has completed checklist"
+    },
+    {
       "name": "hide_desc_badge",
       "title": "Hide description icon",
       "type": "bool",

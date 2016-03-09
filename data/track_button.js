@@ -40,7 +40,8 @@ function makeButton() {
 }
 
 function swapIcons() {
-    var calendar = document.querySelector(DUE_DATE_ICON_SELECTOR);
+    var calendar = document.querySelector(SIDEBAR_SELECTOR)
+                           .querySelector(DUE_DATE_ICON_SELECTOR);
     calendar.classList.remove("icon-clock");
     calendar.classList.add("icon-calendar");
 }
