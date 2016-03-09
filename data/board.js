@@ -68,7 +68,9 @@ function createListHeader(cardMap, timers) {
     });
     let el = document.createElement("span");
     el.classList.add("tt-list-total");
-    el.appendChild(formatHours(today, total));
+    el.dataset.total = total;
+    el.dataset.today = today;
+    el.appendChild(formatTodayHours(today, total));
 
     return el;
 }
