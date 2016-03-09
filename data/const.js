@@ -7,6 +7,8 @@ const COMPLETE_CLASS            = "is-complete";
 const DUE_NOW_CLASS             = "is-due-now";
 const DUE_PAST_CLASS            = "is-due-past";
 const CARD_COMPLETE_CLASS       = "tt-card-complete";
+const LIST_TOTAL_CLASS          = "tt-list-total";
+const HIDE_CLASS                = "tt-hide";
 
 // window/board related
 const OVERLAY_SELECTOR          = ".window-overlay";
@@ -24,6 +26,7 @@ const CLOCK_ICON_SELECTOR       = "." + CLOCK_ICON_CLASS;
 const CHECKLIST_ICON_SELECTOR   = "." + CHECKLIST_ICON_CLASS;
 const DUE_DATE_ICON_SELECTOR    = "." + DUE_DATE_ICON_CLASS;
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
+const LIST_TOTAL_SELECTOR       = "." + LIST_TOTAL_CLASS;
 
 // open card related
 const CARD_WINDOW_SELECTOR      = ".card-detail-window";

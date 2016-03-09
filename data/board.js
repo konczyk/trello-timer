@@ -22,7 +22,8 @@ var options = {
         "handler": toggleCompletedCard,
         "init": true,
         "default_formatter": formatHours,
-        "complete_formatter": formatTotalHours
+        "complete_formatter": formatTotalHours,
+        "onFinish": updateListHeader
     }
 };
 
@@ -38,6 +39,9 @@ self.port.on("initLists", function(timers) {
     Object.keys(options).forEach(function(key) {
         if (options[key].init) {
             toggleCard(options[key].handler);
+            if (options[key].onFinish) {
+                options[key].onFinish();
+            }
         }
     });
 });
@@ -46,6 +50,9 @@ self.port.on("toggleCards", function(change) {
     if (options[change.key]) {
         options[change.key].value = change.value;
         toggleCard(options[change.key].handler);
+        if (options[key].onFinish) {
+            options[key].onFinish();
+        }
     }
 });
 
@@ -67,13 +74,38 @@ function createListHeader(cardMap, timers) {
         total += (timers[cardId] ? timers[cardId].total : 0);
     });
     let el = document.createElement("span");
-    el.classList.add("tt-list-total");
+    el.classList.add(LIST_TOTAL_CLASS);
     el.dataset.total = total;
     el.dataset.today = today;
     el.appendChild(formatTodayHours(today, total));
 
     return el;
 }
+
+function updateListHeader() {
+    var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
+    for (let i = 0; i < lists.length; i++) {
+        let map = getCardsMap(lists[i]);
+        if (map.size > 0) {
+            let complete = 0;
+            map.forEach(function(cardNode, cardId) {
+                if (cardNode.classList.contains(CARD_COMPLETE_CLASS)) {
+                    complete++;
+                }
+            });
+            if (map.size === complete) {
+                let header = lists[i].querySelector(LIST_TOTAL_SELECTOR);
+                header.replaceChild(
+                    formatTotalHours(
+                        header.dataset.today, header.dataset.total
+                    ),
+                    header.firstChild
+                );
+            }
+        }
+    }
+}
+
 
 function addTimerBadges(cardMap, timers) {
     cardMap.forEach(function(cardNode, cardId) {
@@ -111,7 +143,7 @@ function toggleDescBadge(cardNode) {
     var icon = cardNode.querySelector(DESC_ICON_SELECTOR);
     if (icon) {
         icon.parentNode.classList
-            .toggle("tt-hide", options["hide_desc_badge"].value);
+            .toggle(HIDE_CLASS, options["hide_desc_badge"].value);
     }
 }
 
@@ -151,7 +183,7 @@ function toggleCommentBadge(cardNode) {
     var icon = cardNode.querySelector(COMMENT_ICON_SELECTOR);
     if (icon) {
         icon.parentNode.classList
-            .toggle("tt-hide", options["hide_comment_badge"].value);
+            .toggle(HIDE_CLASS, options["hide_comment_badge"].value);
     }
 }
 
@@ -182,7 +214,7 @@ function getCardsMap(listContainer) {
 }
 
 function extractCardId(badgeContainer) {
-    var link = badgeContainer.parentNode.querySelector(".list-card-title");
+    var link = badgeContainer.parentNode.querySelector(CARD_URL_SELECTOR);
     if (!link) {
         console.log("cannnot find card URL");
     }

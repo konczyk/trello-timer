@@ -41,9 +41,9 @@ function makeButton() {
 
 function swapIcons() {
     var calendar = document.querySelector(SIDEBAR_SELECTOR)
-                           .querySelector(DUE_DATE_ICON_SELECTOR);
-    calendar.classList.remove("icon-clock");
-    calendar.classList.add("icon-calendar");
+                           .querySelector(CLOCK_ICON_SELECTOR);
+    calendar.classList.remove(CLOCK_ICON_CLASS);
+    calendar.classList.add(DUE_DATE_ICON_CLASS);
 }
 
 function findInterruptedTime() {

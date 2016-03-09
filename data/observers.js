@@ -57,7 +57,7 @@ function boardReadyListener(mutation) {
 function enableListener(cb) {
     for (var i = 0, len = listeners.length; i < len; i++) {
         if (listeners[i].callback === cb) {
-            console.log("enabled mutation: " + cb);
+            console.log("enabled mutation listener: " + cb.name);
             listeners[i].active = true;
             return;
         }
