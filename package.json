@@ -9,5 +9,23 @@
     "firefox": ">=38.0a1"
   },
   "license": "MIT",
-  "id": "trellotimer@konczyk"
+  "id": "trellotimer@konczyk",
+  "preferences": [
+    {
+      "name": "timer_badge_position",
+      "title": "Position of time icon on the card",
+      "type": "menulist",
+      "value": 0,
+      "options": [
+        {
+          "value": 0,
+          "label": "First"
+        },
+        {
+          "value": 1,
+          "label": "Last"
+        }
+      ]
+    }
+  ]
 }

@@ -46,7 +46,7 @@ function cardOpenListener(mutation) {
 
 function boardReadyListener(mutation) {
     if ((!mutation || mutation.addedNodes.length > 0) &&
-            document.querySelector(CARDS_SELECTOR) !== null) {
+            document.querySelector(CARD_LIST_SELECTOR) !== null) {
         console.log("matching mutation: boardReady");
         self.port.emit("boardReady", null);
     }

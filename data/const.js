@@ -2,9 +2,12 @@
 const OVERLAY_SELECTOR          = ".window-overlay";
 const BOARD_SELECTOR            = "#content";
 const WINDOW_SELECTOR           = ".window-wrapper";
-const CARDS_SELECTOR            = ".list-cards";
+const CARD_LIST_SELECTOR        = ".list";
+const CARD_SELECTOR             = ".list-card-details";
+const CARD_URL_SELECTOR         = ".list-card-title";
 const BADGES_SELECTOR           = ".badges";
 const BADGE_TEXT_SELECTOR       = ".badge-text";
+const TIMER_BADGE_SELECTOR      = ".timer-badge";
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
 
 // card related
@@ -25,7 +28,7 @@ const CLOCK_ICON = (function() {
 })();
 const BADGE = (function() {
     var b = document.createElement("div");
-    b.classList.add("badge");
+    b.classList.add("badge", "timer-badge");
     b.setAttribute("title", "time");
     var icon = document.createElement("span");
     icon.classList.add("badge-icon", "icon-sm", "icon-clock");
