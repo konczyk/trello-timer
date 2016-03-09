@@ -32,6 +32,12 @@
       "title": "Hide description icon",
       "type": "bool",
       "value": false
+    },
+    {
+      "name": "hide_comment_badge",
+      "title": "Hide comment icon",
+      "type": "bool",
+      "value": false
     }
   ]
 }

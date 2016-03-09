@@ -35,14 +35,12 @@ PageMod({
             worker.port.emit("cleanTrackButton", null);
             worker.port.emit("enableCardOpenListener", null);
         });
+
+        // preferences changed
         var prefSet = require("sdk/simple-prefs");
-        prefSet.on("timer_badge_position", function() {
-            worker.port.emit("toggleTimerBadges",
-                             prefSet.prefs["timer_badge_position"]);
-        });
-        prefSet.on("hide_desc_badge", function() {
-            worker.port.emit("toggleDescBadges",
-                             prefSet.prefs["hide_desc_badge"]);
+        prefSet.on("", function(key) {
+            var param = {"key": key, "value": prefSet.prefs[key]};
+            worker.port.emit("toggleCards", param);
         });
     }
 });

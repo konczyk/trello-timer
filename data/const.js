@@ -9,6 +9,7 @@ const BADGES_SELECTOR           = ".badges";
 const BADGE_TEXT_SELECTOR       = ".badge-text";
 const TIMER_BADGE_SELECTOR      = ".timer-badge";
 const DESC_ICON_SELECTOR        = ".icon-description";
+const COMMENT_ICON_SELECTOR     = ".icon-comment";
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
 
 // open card related

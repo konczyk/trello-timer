@@ -1,31 +1,45 @@
 const TIME_ICON_POSITION_FIRST = 0;
 const TIME_ICON_POSITION_LAST = 1;
 
-var timerBadgePosition = self.options.timer_data_position;
-var descBadgeVisibility = self.options.hide_desc_badge;
+var options = {
+    "timer_badge_position": {
+        "value": self.options.timer_badge_position,
+        "handler": toggleTimerBadge,
+        "init": false
+    },
+    "hide_desc_badge": {
+        "value": self.options.hide_desc_badge,
+        "handler": toggleDescBadge,
+        "init": true
+    },
+    "hide_comment_badge": {
+        "value": self.options.hide_comment_badge,
+        "handler": toggleCommentBadge,
+        "init": true
+    }
+};
 
 self.port.on("initLists", function(timers) {
     var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
     for (let i = 0; i < lists.length; i++) {
         let map = getCardsMap(lists[i]);
         addTimerBadges(map, timers);
-        toggleCard(toggleDescBadge);
-
+        Object.keys(options).forEach(function(key) {
+            if (options[key].init) {
+                toggleCard(options[key].handler);
+            }
+        });
         let header = lists[i].querySelector(HEADER_ICON_SELECTOR);
         header.parentNode.insertBefore(createListHeader(map, timers), header);
     }
 });
 
-self.port.on("toggleTimerBadges", function(newValue) {
-    timerBadgePosition = newValue;
-    toggleCard(toggleTimerBadge);
+self.port.on("toggleCards", function(change) {
+    if (options[change.key]) {
+        options[change.key].value = change.value;
+        toggleCard(options[change.key].handler);
+    }
 });
-
-self.port.on("toggleDescBadges", function(newValue) {
-    descBadgeVisibility = newValue;
-    toggleCard(toggleDescBadge);
-});
-
 
 function toggleCard(callback) {
     var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
@@ -67,17 +81,25 @@ function toggleTimerBadge(cardNode, newBadge) {
     var badgeNode = newBadge ||
                     badgeContainer.querySelector(TIMER_BADGE_SELECTOR);
     var index = 0;
-    if (timerBadgePosition === TIME_ICON_POSITION_LAST) {
+    if (options["timer_badge_position"].value === TIME_ICON_POSITION_LAST) {
         index = badgeContainer.childNodes.length - 1;
     }
     badgeContainer.insertBefore(badgeNode, badgeContainer.childNodes[index]);
 }
 
 function toggleDescBadge(cardNode) {
-    var descIcon = cardNode.querySelector(DESC_ICON_SELECTOR);
-    if (descIcon) {
-        console.log(descBadgeVisibility);
-        descIcon.parentNode.classList.toggle("tt-hide", descBadgeVisibility);
+    var icon = cardNode.querySelector(DESC_ICON_SELECTOR);
+    if (icon) {
+        icon.parentNode.classList
+            .toggle("tt-hide", options["hide_desc_badge"].value);
+    }
+}
+
+function toggleCommentBadge(cardNode) {
+    var icon = cardNode.querySelector(COMMENT_ICON_SELECTOR);
+    if (icon) {
+        icon.parentNode.classList
+            .toggle("tt-hide", options["hide_comment_badge"].value);
     }
 }
 
