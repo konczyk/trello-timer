@@ -23,6 +23,7 @@ self.port.on("initLists", function(timers) {
     var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
     for (let i = 0; i < lists.length; i++) {
         let map = getCardsMap(lists[i]);
+        switchDueDateIcons(lists[i]);
         addTimerBadges(map, timers);
         Object.keys(options).forEach(function(key) {
             if (options[key].init) {
@@ -74,6 +75,14 @@ function addTimerBadges(cardMap, timers) {
             .appendChild(formatHours(today, total));
         toggleTimerBadge(cardNode, newBadge);
     })
+}
+
+function switchDueDateIcons(listContainer) {
+    var dateIcons = listContainer.querySelectorAll(CLOCK_ICON_SELECTOR);
+    for (let i = 0; i < dateIcons.length; i++) {
+        dateIcons[i].classList.remove(CLOCK_ICON_CLASS);
+        dateIcons[i].classList.add(DUE_DATE_ICON_CLASS);
+    }
 }
 
 function toggleTimerBadge(cardNode, newBadge) {

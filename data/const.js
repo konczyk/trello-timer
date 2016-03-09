@@ -1,3 +1,8 @@
+const TRACK_BUTTON_TEXT         = " Track time";
+const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
+const CLOCK_ICON_CLASS          = "icon-clock";
+const DUE_DATE_ICON_CLASS       = "icon-calendar";
+
 // window/board related
 const OVERLAY_SELECTOR          = ".window-overlay";
 const BOARD_SELECTOR            = "#content";
@@ -10,6 +15,7 @@ const BADGE_TEXT_SELECTOR       = ".badge-text";
 const TIMER_BADGE_SELECTOR      = ".timer-badge";
 const DESC_ICON_SELECTOR        = ".icon-description";
 const COMMENT_ICON_SELECTOR     = ".icon-comment";
+const CLOCK_ICON_SELECTOR       = "." + CLOCK_ICON_CLASS;
 const HEADER_ICON_SELECTOR      = ".list-header .icon-dropdown-menu";
 
 // open card related
@@ -21,11 +27,9 @@ const DUE_DATE_ICON_SELECTOR    = ".window-sidebar .icon-clock";
 const COMMENT_BUTTON_SELECTOR   = ".new-comment .confirm";
 const COMMENT_AREA_SELECTOR     = ".comment-box-input";
 
-const TRACK_BUTTON_TEXT = " Track time";
-const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
 const CLOCK_ICON = (function() {
     var icon = document.createElement("span");
-    icon.classList.add("icon-sm", "icon-clock");
+    icon.classList.add("icon-sm", CLOCK_ICON_CLASS);
     return icon;
 })();
 const BADGE = (function() {
@@ -33,7 +37,7 @@ const BADGE = (function() {
     b.classList.add("badge", "timer-badge");
     b.setAttribute("title", "time");
     var icon = document.createElement("span");
-    icon.classList.add("badge-icon", "icon-sm", "icon-clock");
+    icon.classList.add("badge-icon", "icon-sm", CLOCK_ICON_CLASS);
     b.appendChild(icon);
     var t = document.createElement("span");
     t.classList.add("badge-text");
