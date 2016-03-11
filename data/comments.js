@@ -1,4 +1,4 @@
-self.port.on("addTimeComment", function(times) {
+self.port.on("timerStop", function(times) {
     var card = document.querySelector(CARD_WINDOW_SELECTOR);
     var submit = card.querySelector(COMMENT_BUTTON_SELECTOR);
     var area = card.querySelector(COMMENT_AREA_SELECTOR);

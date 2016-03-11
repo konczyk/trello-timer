@@ -1,55 +1,56 @@
 var {PageMod} = require("sdk/page-mod");
-var {saveTimer, getTimersPerCard} = require("./storage");
+var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
+
+var {saveTimer, getTimersPerCard} = require("./storage");
+//require("./http_observer");
 
 PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
+        "./onload.js",
         "./const.js",
         "./utils.js",
-        "./observers.js",
+        "./mutation_observer.js",
         "./board.js",
         "./card.js",
         "./track_button.js",
         "./comments.js",
     ],
     contentStyleFile: "./style.css",
-    contentScriptWhen: "ready",
+    contentScriptWhen: "start",
     contentScriptOptions: prefs,
+    attachTo: ["existing", "top"],
     onAttach: function(worker) {
 
-        function sync() {
+        worker.port.on("listsChange", function() {
             getTimersPerCard(function(timers) {
                 worker.port.emit("syncLists", timers);
             });
-        }
-
-        worker.port.emit("attachObservers", null);
-
-        worker.port.on("boardReady", sync);
-        worker.port.on("cardDrop", sync);
-
-        worker.port.on("cardOpen", function() {
-            worker.port.emit("attachTrackButton", null);
-            worker.port.emit("attachCardListeners", null);
         });
 
-        worker.port.on("timerStop", function(timer) {
-            worker.port.emit("addTimeComment", timer);
-            saveTimer(timer);
+        worker.port.on("cardOpen", function() {
+            worker.port.emit("cardOpen", null);
         });
 
         worker.port.on("cardClose", function() {
-            worker.port.emit("cleanTrackButton", null);
-            worker.port.emit("enableCardOpenListener", null);
-            sync();
+            worker.port.emit("cardClose", null);
+        });
+
+        worker.port.on("timerStop", function(timer) {
+            worker.port.emit("timerStop", timer);
+            saveTimer(timer);
         });
 
         // preferences changed
         var prefSet = require("sdk/simple-prefs");
         prefSet.on("", function(key) {
             var param = {"key": key, "value": prefSet.prefs[key]};
-            worker.port.emit("toggleCards", param);
+            try {
+                worker.port.emit("toggleCards", param);
+            } catch (e) {
+                console.log(e.message);
+            }
         });
     }
 });

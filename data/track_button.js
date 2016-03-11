@@ -4,7 +4,7 @@ var trackInterval = null;
 var card = null;
 var interruptedTimers = [];
 
-self.port.on("attachTrackButton", function() {
+self.port.on("cardOpen", function() {
     card = getCardIdFromURL();
     var container = document.querySelector(ACTIONS_SELECTOR);
     button = makeButton();
@@ -14,7 +14,7 @@ self.port.on("attachTrackButton", function() {
     }
 });
 
-self.port.on("cleanTrackButton", function() {
+self.port.on("cardClose", function() {
     if (trackStart !== null) {
         interruptedTimers.push({
             "card": card,

@@ -1,4 +1,4 @@
-self.port.on("attachCardListeners", function() {
+self.port.on("cardOpen", function() {
     var close = document.querySelector(CLOSE_CARD_SELECTOR);
     var overlay = document.querySelector(OVERLAY_SELECTOR);
 

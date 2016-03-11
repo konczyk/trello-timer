@@ -26,7 +26,7 @@ idb.onupgradeneeded = function(e) {
 function saveTimer(timer) {
     var trans = db.transaction(["timers"], "readwrite");
     trans.oncomplete = function() {
-        console.log("transaction completed");
+        console.log("saveTimer transaction completed");
     }
     trans.onerror = idb.onerror;
 
@@ -36,45 +36,39 @@ function saveTimer(timer) {
     }
 }
 
-function getTimersPerCard(callback) {
-    var trans = db.transaction(["timers"], "readwrite");
-    var store = trans.objectStore("timers");
+function groupByCards(objects) {
     var items = {};
-
-    trans.oncomplete = function() {
-        console.log("getTimesPerCard: transaction completed");
-        callback(items);
-    }
-    trans.onerror = idb.onerror;
-
-    var keyRange = IDBKeyRange.lowerBound(0);
-    var cursorRequest = store.openCursor(keyRange);
-    cursorRequest.onerror = idb.onerror;
-
-    cursorRequest.onsuccess = function(e) {
-        var result = e.target.result;
-        if(!!result == false) {
-            return;
-        }
-
-        var card = result.value.card;
-        var start = new Date(result.value.start);
-        var end = new Date(result.value.end);
+    objects.forEach(function(el) {
+        var start = new Date(el.start);
+        var end = new Date(el.end);
         var time = parseInt(end - start, 10) / 1000;
-        if (!items[card]) {
-            items[card] = {
+        if (!items[el.card]) {
+            items[el.card] = {
                 total: time,
                 today: 0
             }
         } else {
-            items[card].total += time;
+            items[el.card].total += time;
         }
 
         if (start.toDateString() === new Date().toDateString()) {
-            items[card].today += time;
+            items[el.card].today += time;
         }
+    });
 
-        result.continue();
+    return items;
+}
+
+function getTimersPerCard(callback) {
+    console.log("getTimesPerCard started");
+    var trans = db.transaction(["timers"], "readwrite");
+    var store = trans.objectStore("timers");
+
+    var request = store.getAll();
+    request.onsuccess = function() {
+        console.log("getTimesPerCard transaction completed");
+        var items = groupByCards(request.result);
+        callback(items);
     }
 }
 
