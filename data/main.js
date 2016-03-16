@@ -36,7 +36,7 @@ PageMod({
         });
 
         worker.port.on("cardClose", function() {
-            worker.port.emit("cardClose", null);
+            refresh();
         });
 
         worker.port.on("logTime", function(logEntry) {
