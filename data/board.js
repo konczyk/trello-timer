@@ -1,123 +1,99 @@
-const TIME_ICON_POSITION_FIRST = 0;
-const TIME_ICON_POSITION_LAST = 1;
+self.port.on("listsChanged", function(logEntries) {
+    updateLists(logEntries);
+});
 
-var options = {
-    "timer_badge_position": {
-        "value": self.options.timer_badge_position,
-        "handler": toggleTimerBadge,
-        "init": false
-    },
-    "hide_desc_badge": {
-        "value": self.options.hide_desc_badge,
-        "handler": toggleDescBadge,
-        "init": true
-    },
-    "hide_comment_badge": {
-        "value": self.options.hide_comment_badge,
-        "handler": toggleCommentBadge,
-        "init": true
-    },
-    "enable_completed_card": {
-        "value": self.options.enable_completed_card,
-        "handler": toggleCompletedCard,
-        "init": true,
-        "default_formatter": formatHours,
-        "complete_formatter": formatTotalHours,
-        "onFinish": updateListHeader
-    }
-};
+(function(win) {
+    'use strict';
 
-self.port.on("syncLists", function(timers) {
-    var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
-    for (let i = 0; i < lists.length; i++) {
-        let map = getCardsMap(lists[i]);
-        switchDueDateIcons(lists[i]);
-        addTimerBadges(map, timers);
-        let header = lists[i].querySelector(HEADER_ICON_SELECTOR);
-        let oldTotal = lists[i].querySelector(LIST_TOTAL_SELECTOR);
-        let newTotal = createListHeader(map, timers);
-        if (oldTotal === null) {
-            header.parentNode.insertBefore(newTotal, header);
-        } else {
-            header.parentNode.replaceChild(newTotal, oldTotal);
+    win.updateLists = updateLists;
+
+    const TIME_ICON_POSITION_FIRST = 0;
+    const TIME_ICON_POSITION_LAST = 1;
+
+    var options = {
+        "timer_badge_position": self.options.timer_badge_position,
+        "hide_desc_badge": self.options.hide_desc_badge,
+        "hide_comment_badge": self.options.hide_comment_badge,
+        "enable_completed_card": self.options.enable_completed_card
+    },
+    cardRe = new RegExp(/^\/c\/([A-Za-z0-9]{8,})\/.*$/);
+
+    function updateLists(params) {
+        if (Object.keys(params.options).length > 0) {
+            options[params.options.key] = params.options.value;
         }
-    }
-    Object.keys(options).forEach(function(key) {
-        if (options[key].init) {
-            toggleCard(options[key].handler);
-            if (options[key].onFinish) {
-                options[key].onFinish();
+        var logEntries = params.time;
+
+        var lists = getListsNode();
+        for (let i = 0; i < lists.length; i++) {
+            let map = getCardsMap(lists[i]);
+            map.forEach(function(cardNode, cardId) {
+                addTimerBadges(cardNode, logEntries[cardId]);
+                toggleCalendarIcons(cardNode);
+                toggleDescBadge(cardNode);
+                toggleCommentsBadge(cardNode);
+                toggleCompletedCard(cardNode);
+            });
+            let header = getListHeaderIconNode(lists[i]);
+            let oldTotal = getListTotalNode(lists[i]);
+            let newTotal = createListHeader(map, logEntries);
+            if (oldTotal === null) {
+                header.parentNode.insertBefore(newTotal, header);
+            } else {
+                header.parentNode.replaceChild(newTotal, oldTotal);
             }
         }
-    });
-});
-
-self.port.on("toggleCards", function(change) {
-    if (options[change.key]) {
-        options[change.key].value = change.value;
-        toggleCard(options[change.key].handler);
-        if (options[change.key].onFinish) {
-            options[change.key].onFinish();
-        }
     }
-});
 
-function toggleCard(callback) {
-    var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
-    for (let i = 0; i < lists.length; i++) {
-        let map = getCardsMap(lists[i]);
-        map.forEach(function(cardNode, cardId) {
-            callback(cardNode);
+    function createListHeader(cardMap, logEntries) {
+        var today = 0;
+        var total = 0;
+        cardMap.forEach(function(cardNode, cardId) {
+            today += (logEntries[cardId] ? logEntries[cardId].today : 0);
+            total += (logEntries[cardId] ? logEntries[cardId].total : 0);
         });
+        let el = document.createElement("span");
+        el.classList.add("tt-list-total");
+        el.dataset.total = total;
+        el.dataset.today = today;
+        el.appendChild(formatTodayHours(today, total));
+
+        return el;
     }
-}
 
-function createListHeader(cardMap, timers) {
-    var today = 0;
-    var total = 0;
-    cardMap.forEach(function(cardNode, cardId) {
-        today += (timers[cardId] ? timers[cardId].today : 0);
-        total += (timers[cardId] ? timers[cardId].total : 0);
-    });
-    let el = document.createElement("span");
-    el.classList.add(LIST_TOTAL_CLASS);
-    el.dataset.total = total;
-    el.dataset.today = today;
-    el.appendChild(formatTodayHours(today, total));
-
-    return el;
-}
-
-function updateListHeader() {
-    var lists = document.querySelectorAll(CARD_LIST_SELECTOR);
-    for (let i = 0; i < lists.length; i++) {
-        let map = getCardsMap(lists[i]);
-        if (map.size > 0) {
-            let complete = 0;
-            map.forEach(function(cardNode, cardId) {
-                if (cardNode.classList.contains(CARD_COMPLETE_CLASS)) {
-                    complete++;
-                }
-            });
-            let header = lists[i].querySelector(LIST_TOTAL_SELECTOR);
-            let formatter = map.size === complete ?
-                                formatTotalHours:
-                                formatTodayHours;
-            header.replaceChild(
-                formatter(header.dataset.today, header.dataset.total),
-                header.firstChild
-            );
+    function getCardsMap(listContainer) {
+        var map = new Map();
+        var cards = listContainer.querySelectorAll(".list-card-details");
+        for (let i = 0; i < cards.length; i++) {
+            let cardLink = getCardUrlNode(cards[i]);
+            map.set(extractCardId(cardLink), cards[i]);
         }
-    }
-}
 
-function addTimerBadges(cardMap, timers) {
-    cardMap.forEach(function(cardNode, cardId) {
-        var today = timers[cardId] ? timers[cardId].today : 0;
-        var total = timers[cardId] ? timers[cardId].total : 0;
-        var oldBadge = cardNode.querySelector(TIMER_BADGE_SELECTOR);
-        var badge = oldBadge || BADGE.cloneNode(true);
-        var text = badge.querySelector(BADGE_TEXT_SELECTOR);
+        return map;
+    }
+
+    function extractCardId(cardLink) {
+        if (!cardLink || !cardLink.getAttribute("href")) {
+            console.log("cannnot find card URL");
+        }
+
+        var parser = document.createElement("a");
+        parser.href = cardLink.getAttribute("href");
+
+        var matches = cardRe.exec(parser.pathname);
+        if (!matches) {
+            console.error("not a card path: " + parser.pathname);
+        }
+
+        return matches[1];
+    }
+
+    function addTimerBadges(cardNode, logEntry) {
+        var today = logEntry ? logEntry.today : 0;
+        var total = logEntry ? logEntry.total : 0;
+        var oldBadge = getTimerBadgeNode(cardNode);
+        var badge = oldBadge || createTimerBadgeNode();
+        var text = getTimerBadgeText(badge);
 
         if (!oldBadge) {
             text.appendChild(formatHours(today, total));
@@ -128,101 +104,145 @@ function addTimerBadges(cardMap, timers) {
         }
         badge.dataset.today = today;
         badge.dataset.total = total;
-    })
-}
+    }
 
-function switchDueDateIcons(listContainer) {
-    var dateIcons = listContainer.querySelectorAll(CLOCK_ICON_SELECTOR);
-    for (let i = 0; i < dateIcons.length; i++) {
-        if (!dateIcons[i].parentNode.classList.contains(TIME_BADGE_CLASS)) {
-            dateIcons[i].classList.remove(CLOCK_ICON_CLASS);
-            dateIcons[i].classList.add(DUE_DATE_ICON_CLASS);
+    function toggleTimerBadge(cardNode, newBadge) {
+        var badgesNode = getBadgesNode(cardNode);
+        var badgeNode = newBadge || getTimerBadgeNode(badgesNode);
+        var index = 0;
+        if (options.timer_badge_position === TIME_ICON_POSITION_LAST) {
+            index = badgesNode.childNodes.length - 1;
+        }
+        badgesNode.insertBefore(badgeNode, badgesNode.childNodes[index]);
+    }
+
+    function toggleCalendarIcons(cardNode) {
+        var icons = getClockIconNodes(cardNode);
+        for (let i = 0; i < icons.length; i++) {
+            if (!isTimerBadge(icons[i].parentNode)) {
+                swapIcons(icons[i].parentNode);
+            }
         }
     }
-}
 
-function toggleTimerBadge(cardNode, newBadge) {
-    var badgeContainer = cardNode.querySelector(BADGES_SELECTOR);
-    var badgeNode = newBadge ||
-                    badgeContainer.querySelector(TIMER_BADGE_SELECTOR);
-    var index = 0;
-    if (options["timer_badge_position"].value === TIME_ICON_POSITION_LAST) {
-        index = badgeContainer.childNodes.length - 1;
-    }
-    badgeContainer.insertBefore(badgeNode, badgeContainer.childNodes[index]);
-}
-
-function toggleDescBadge(cardNode) {
-    var icon = cardNode.querySelector(DESC_ICON_SELECTOR);
-    if (icon) {
-        icon.parentNode.classList
-            .toggle(HIDE_CLASS, options["hide_desc_badge"].value);
-    }
-}
-
-function toggleCompletedCard(cardNode) {
-    var enabled = options["enable_completed_card"].value;
-    var ckIcon = cardNode.querySelector(CHECKLIST_ICON_SELECTOR);
-    var calIcon = cardNode.querySelector(DUE_DATE_ICON_SELECTOR);
-
-    if (!ckIcon || !calIcon || !enabled) {
-        enabled = false;
-    } else {
-        let checklist = ckIcon.parentNode.classList.contains(COMPLETE_CLASS);
-        let due_date = calIcon.parentNode.classList.contains(DUE_NOW_CLASS) ||
-                       calIcon.parentNode.classList.contains(DUE_PAST_CLASS);
-        enabled = checklist && due_date;
+    function toggleDescBadge(cardNode) {
+        var icon = getDescIconNode(cardNode);
+        toggleBadgeVisibility(icon, "hide_desc_badge");
     }
 
-    var timer = cardNode.querySelector(TIMER_BADGE_SELECTOR);
-    var timerText = timer.querySelector(BADGE_TEXT_SELECTOR);
-    var cardComplete = cardNode.classList.contains(CARD_COMPLETE_CLASS);
-
-    if (enabled) {
-        let formatter = options.enable_completed_card.complete_formatter;
-        let newTime = formatter(timer.dataset.today, timer.dataset.total);
-        cardNode.classList.add(CARD_COMPLETE_CLASS);
-        timerText.replaceChild(newTime, timerText.firstChild);
-    } else if (cardComplete) {
-        let formatter = options.enable_completed_card.default_formatter;
-        let newTime = formatter(timer.dataset.today, timer.dataset.total);
-        cardNode.classList.remove(CARD_COMPLETE_CLASS);
-        timerText.replaceChild(newTime, timerText.firstChild);
-    }
-}
-
-function toggleCommentBadge(cardNode) {
-    var icon = cardNode.querySelector(COMMENT_ICON_SELECTOR);
-    if (icon) {
-        icon.parentNode.classList
-            .toggle(HIDE_CLASS, options["hide_comment_badge"].value);
-    }
-}
-
-function getCardsMap(listContainer) {
-    var map = new Map();
-    var cards = listContainer.querySelectorAll(CARD_SELECTOR);
-    for (let i = 0; i < cards.length; i++) {
-        map.set(
-            extractCardId(cards[i].querySelector(CARD_URL_SELECTOR)),
-            cards[i]);
+    function toggleCommentsBadge(cardNode) {
+        var icon = getCommentsIconNode(cardNode);
+        toggleBadgeVisibility(icon, "hide_comment_badge");
     }
 
-    return map;
-}
-
-function extractCardId(badgeContainer) {
-    var link = badgeContainer.parentNode.querySelector(CARD_URL_SELECTOR);
-    if (!link) {
-        console.log("cannnot find card URL");
+    function toggleBadgeVisibility(icon, opt) {
+        if (icon) {
+            var classList = icon.parentNode.classList;
+            classList.toggle("tt-hide", options[opt]);
+        }
     }
 
-    var parser = document.createElement("a");
-    parser.href = link.getAttribute("href");
+    function toggleCompletedCard(cardNode) {
+        var enabled = options.enable_completed_card;
+        var checkIcon = getChecklistIconNode(cardNode);
+        var dueIcon = getDueDateIconNode(cardNode);
 
-    if (!parser.pathname.match(/^\/c\/[A-Za-z0-9]{8,}\/.*$/)) {
-        console.error("not a card path: " + parser.pathname);
+        if (!checkIcon || !dueIcon || !enabled) {
+            enabled = false;
+        } else {
+            let checklist = isChecklistCompleteBadge(checkIcon.parentNode);
+            let dueDate = isDueDatePastBadge(dueIcon.parentNode);
+            enabled = checklist && dueDate;
+        }
+
+        var timer = getTimerBadgeNode(cardNode);
+        var timerText = getTimerBadgeText(timer);
+        var cardComplete = isCardComplete(cardNode);
+
+        if (enabled) {
+            let newTime = formatTotalHours(timer.dataset.today,
+                                           timer.dataset.total);
+            markCardCompleted(cardNode);
+            timerText.replaceChild(newTime, timerText.firstChild);
+        } else if (cardComplete) {
+            let newTime = formatHours(timer.dataset.today,
+                                      timer.dataset.total);
+            markCardNotCompleted(cardNode);
+            timerText.replaceChild(newTime, timerText.firstChild);
+        }
     }
 
-    return parser.pathname.split("/")[2];
-}
+    function getListsNode() {
+        return document.querySelectorAll(".list");
+    }
+
+    function getListHeaderIconNode(ctx) {
+        return ctx.querySelector(".list-header .icon-dropdown-menu");
+    }
+
+    function getListTotalNode(ctx) {
+        return ctx.querySelector(".tt-list-total");
+    }
+
+    function getCardUrlNode(ctx) {
+        return ctx.querySelector(".list-card-title");
+    }
+
+    function isCardComplete(card) {
+        return card.classList.contains("tt-card-complete");
+    }
+
+    function markCardCompleted(card) {
+        card.classList.add("tt-card-complete");
+    }
+
+    function markCardNotCompleted(card) {
+        card.classList.remove("tt-card-complete");
+    }
+
+    function getBadgesNode(ctx) {
+        return ctx.querySelector(".badges");
+    }
+
+    function isTimerBadge(node) {
+        return node.classList.contains("timer-badge");
+    }
+
+    function isChecklistCompleteBadge(node) {
+        return node.classList.contains("is-complete");
+    }
+
+    function isDueDatePastBadge(node) {
+        var cList = node.classList;
+        return cList.contains("is-due-now") || cList.contains("is-due-past");
+    }
+
+    function getTimerBadgeNode(ctx) {
+        return ctx.querySelector(".timer-badge");
+    }
+
+    function getTimerBadgeText(ctx) {
+        return ctx.querySelector(".badge-text");
+    }
+
+    function getClockIconNodes(ctx) {
+        return ctx.querySelectorAll(".icon-clock");
+    }
+
+    function getDescIconNode(ctx) {
+        return ctx.querySelector(".icon-description");
+    }
+
+    function getChecklistIconNode(ctx) {
+        return ctx.querySelector(".icon-checklist");
+    }
+
+    function getDueDateIconNode(ctx) {
+        return ctx.querySelector(".icon-calendar");
+    }
+
+    function getCommentsIconNode(ctx) {
+        return ctx.querySelector(".icon-comment");
+    }
+
+})(this);

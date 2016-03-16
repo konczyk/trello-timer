@@ -1,3 +1,30 @@
+const CLOCK_ICON = (function() {
+    var icon = document.createElement("span");
+    icon.classList.add("icon-sm", "icon-clock");
+    return icon;
+})();
+
+const BADGE = (function() {
+    var b = document.createElement("div");
+    b.classList.add("badge", "timer-badge");
+    b.setAttribute("title", "time");
+    var icon = createClockIconNode();
+    icon.classList.add("badge-icon");
+    b.appendChild(icon);
+    var t = document.createElement("span");
+    t.classList.add("badge-text");
+    b.appendChild(t);
+    return b;
+})();
+
+function createClockIconNode() {
+    return CLOCK_ICON.cloneNode();
+}
+
+function createTimerBadgeNode() {
+    return BADGE.cloneNode(true);
+}
+
 function intervalToClock(startTime, endTime) {
     var diff = (endTime - startTime) / 1000;
     var h = Math.floor(diff / 3600) % 24;
@@ -12,15 +39,6 @@ function intervalToMinClock(diff) {
     var h = parseFloat(diff / 1000 / 3600) % 24;
 
     return h.toFixed(1);
-}
-
-function getCardIdFromURL() {
-    var path = window.location.pathname;
-    if (!path.match(/^\/c\/[A-Za-z0-9]{8,}\/.*$/)) {
-        console.error("not a card path: " + path);
-    }
-
-    return path.split("/")[2];
 }
 
 function toHours(time) {
@@ -40,3 +58,16 @@ function formatTotalHours(today, total) {
 function formatTodayHours(today, total) {
     return document.createTextNode(toHours(today));
 }
+
+function emptyNode(node) {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
+}
+
+function swapIcons(node) {
+    var calendar = node.querySelector(".icon-clock");
+    calendar.classList.remove("icon-clock");
+    calendar.classList.add("icon-calendar");
+}
+

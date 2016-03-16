@@ -2,20 +2,17 @@ var {PageMod} = require("sdk/page-mod");
 var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 
-var {saveTimer, getTimersPerCard} = require("./storage");
+var {saveTime, getTimePerCard} = require("./storage");
 //require("./http_observer");
 
 PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
         "./onload.js",
-        "./const.js",
         "./utils.js",
         "./mutation_observer.js",
         "./board.js",
-        "./card.js",
-        "./track_button.js",
-        "./comments.js",
+        "./card.js"
     ],
     contentStyleFile: "./style.css",
     contentScriptWhen: "start",
@@ -23,10 +20,15 @@ PageMod({
     attachTo: ["existing", "top"],
     onAttach: function(worker) {
 
-        worker.port.on("listsChange", function() {
-            getTimersPerCard(function(timers) {
-                worker.port.emit("syncLists", timers);
+        function refresh(opts) {
+            getTimePerCard(function(time) {
+                worker.port.emit("listsChanged",
+                                 {"time": time, "options": opts || {}});
             });
+        }
+
+        worker.port.on("listsChange", function() {
+            refresh();
         });
 
         worker.port.on("cardOpen", function() {
@@ -37,20 +39,14 @@ PageMod({
             worker.port.emit("cardClose", null);
         });
 
-        worker.port.on("timerStop", function(timer) {
-            worker.port.emit("timerStop", timer);
-            saveTimer(timer);
+        worker.port.on("logTime", function(logEntry) {
+            saveTime(logEntry);
         });
 
         // preferences changed
         var prefSet = require("sdk/simple-prefs");
         prefSet.on("", function(key) {
-            var param = {"key": key, "value": prefSet.prefs[key]};
-            try {
-                worker.port.emit("toggleCards", param);
-            } catch (e) {
-                console.log(e.message);
-            }
+            refresh({"key": key, "value": prefSet.prefs[key]});
         });
     }
 });
