@@ -28,9 +28,11 @@ Default is front (left side).
 
 ### Enable completed cards
 Changes display options for completed cards. Completed card is a card that has
-a completed checklist and a due date in the past. It these conditions are met,
-the timer badge will get a green background and will only show total time spent,
-the due date badge will also get a green background.  
+a completed checklist and a due date in the past. If these conditions are met,
+the timer badge will only show the total time spent and both timer badge and
+due date badge will get a green background.  
+If the given lists contains completed cards only, the list header will display
+the total time spent.  
 Default is false
 
 ![card list](img/complete.png)
@@ -50,6 +52,6 @@ At the moment you can install it only manually by first building it with jpm
 `jpm xpi`
 
 And then installing the built xpi file in your firefox browser (you can simply
-open the xpi file through the browser and the install will follow). You may 
-need to tune `xpinstall.signatures.required` setting in `about:config` to allow 
-unverified extensions.
+open the xpi file through the browser and the install process will follow).
+You may need to tune `xpinstall.signatures.required` setting in `about:config`
+to allow unverified extensions.

@@ -56,7 +56,11 @@ self.port.on("listsChanged", function(logEntries) {
         el.classList.add("tt-list-total");
         el.dataset.total = total;
         el.dataset.today = today;
-        el.appendChild(formatTodayHours(today, total));
+        if (isListComplete(cardMap)) {
+            el.appendChild(formatTotalHours(today, total));
+        } else {
+            el.appendChild(formatTodayHours(today, total));
+        }
 
         return el;
     }
@@ -190,6 +194,16 @@ self.port.on("listsChanged", function(logEntries) {
 
     function isCardComplete(card) {
         return card.classList.contains("tt-card-complete");
+    }
+
+    function isListComplete(cardMap) {
+        for (let [cardId, cardNode] of cardMap) {
+            if (!isCardComplete(cardNode)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function markCardCompleted(card) {
