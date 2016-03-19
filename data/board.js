@@ -22,13 +22,13 @@ self.port.on("listsChanged", function(logEntries) {
         if (Object.keys(params.options).length > 0) {
             options[params.options.key] = params.options.value;
         }
-        var logEntries = params.time;
+        var cardsData = params.cardsData;
 
         var lists = getListsNode();
         for (let i = 0; i < lists.length; i++) {
             let map = getCardsMap(lists[i]);
             map.forEach(function(cardNode, cardId) {
-                addTimerBadges(cardNode, logEntries[cardId]);
+                addTimerBadges(cardNode, cardsData[cardId]);
                 toggleCalendarIcons(cardNode);
                 toggleDescBadge(cardNode);
                 toggleCommentsBadge(cardNode);
@@ -36,7 +36,7 @@ self.port.on("listsChanged", function(logEntries) {
             });
             let header = getListHeaderIconNode(lists[i]);
             let oldTotal = getListTotalNode(lists[i]);
-            let newTotal = createListHeader(map, logEntries);
+            let newTotal = createListHeader(map, cardsData);
             if (oldTotal === null) {
                 header.parentNode.insertBefore(newTotal, header);
             } else {
@@ -45,12 +45,12 @@ self.port.on("listsChanged", function(logEntries) {
         }
     }
 
-    function createListHeader(cardMap, logEntries) {
+    function createListHeader(cardMap, cardsData) {
         var today = 0;
         var total = 0;
         cardMap.forEach(function(cardNode, cardId) {
-            today += (logEntries[cardId] ? logEntries[cardId].today : 0);
-            total += (logEntries[cardId] ? logEntries[cardId].total : 0);
+            today += (cardsData[cardId] ? cardsData[cardId].todayTime : 0);
+            total += (cardsData[cardId] ? cardsData[cardId].totalTime : 0);
         });
         let el = document.createElement("span");
         el.classList.add("tt-list-total");
@@ -92,9 +92,9 @@ self.port.on("listsChanged", function(logEntries) {
         return matches[1];
     }
 
-    function addTimerBadges(cardNode, logEntry) {
-        var today = logEntry ? logEntry.today : 0;
-        var total = logEntry ? logEntry.total : 0;
+    function addTimerBadges(cardNode, cardData) {
+        var today = cardData ? cardData.todayTime : 0;
+        var total = cardData ? cardData.totalTime : 0;
         var oldBadge = getTimerBadgeNode(cardNode);
         var badge = oldBadge || createTimerBadgeNode();
         var text = getTimerBadgeText(badge);

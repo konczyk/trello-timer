@@ -10,7 +10,9 @@ one.
 
 ## Stores data in a local database
 Time is logged in a local database (indexedDB), log entries are added through
-comments, so it is possible to log time manually by adding a comment
+comments, so it is possible to log time manually by adding a comment. Logged
+date is taken from the comment itself to make it possible to edit/delete log
+entries through Trello comments as well.
  
 ``log `hh:mm:ss` ``
 

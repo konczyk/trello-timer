@@ -1,8 +1,9 @@
 var {indexedDB, IDBKeyRange} = require("sdk/indexed-db");
-const VERSION = 1;
-const TIMELOG = "timelog";
-var db;
 
+const VERSION = 1;
+const CARDS = "trelloCards";
+
+var db;
 var idb = indexedDB.open("TrelloTimer", VERSION);
 
 idb.onerror = function(e) {
@@ -15,63 +16,86 @@ idb.onsuccess = function(e) {
 
 idb.onupgradeneeded = function(e) {
     var db = e.target.result;
-    if (!db.objectStoreNames.contains(TIMELOG)) {
-        var store = db.createObjectStore(TIMELOG, {autoIncrement: true});
-        store.createIndex("card", "card", {unique: false});
-        store.createIndex("start", "start", {unique: false});
-        store.createIndex("end", "end", {unique: false});
-        console.log("created " + TIMELOG);
+    var trans = e.target.transation;
+    if (e.newVersion === 1) {
+        var store = db.createObjectStore(CARDS, {keyPath: "cardId"});
+        store.createIndex("lastLogged", "lastLogged", {unique: false});
     }
 }
 
-function saveTime(logEntry) {
-    var trans = db.transaction([TIMELOG], "readwrite");
+function logTime(data) {
+    var trans = db.transaction(CARDS, "readwrite");
+    var store = trans.objectStore(CARDS);
     trans.oncomplete = function() {
-        console.log("saveTime transaction completed");
+        console.log("logTime transaction completed");
     }
     trans.onerror = idb.onerror;
 
-    var request = trans.objectStore(TIMELOG).add(logEntry);
-    request.onsuccess = function(e) {
-        console.log("Stored new time log : " + JSON.stringify(logEntry));
+    var getReq = store.get(data.cardId);
+    getReq.onsuccess = function(e) {
+        var card = getReq.result || createCard(data.cardId);
+        card.lastLogged = data.at;
+        card.totalTime += data.time;
+        card.timeLogs.push({"at": data.at, "time": data.time});
+
+        putReq = store.put(card);
+        putReq.onsuccess = function() {
+            console.log("logTime puts a card " + JSON.stringify(card));
+        }
     }
 }
-
-function groupByCards(objects) {
-    var items = {};
-    objects.forEach(function(el) {
-        var start = new Date(el.start);
-        var end = new Date(el.end);
-        var time = parseInt(end - start, 10) / 1000;
-        if (!items[el.card]) {
-            items[el.card] = {
-                total: time,
-                today: 0
-            }
-        } else {
-            items[el.card].total += time;
-        }
-
-        if (start.toDateString() === new Date().toDateString()) {
-            items[el.card].today += time;
-        }
-    });
-
-    return items;
+function createCard(cardId) {
+    return {
+        "cardId": cardId,
+        "lastLogged": null,
+        "totalTime": 0,
+        "timeLogs": []
+    };
 }
 
-function getTimePerCard(callback) {
-    console.log("getTimePerCard started");
-    var trans = db.transaction([TIMELOG], "readwrite");
-    var store = trans.objectStore(TIMELOG);
+function getCards(callback) {
+    console.log("getCards started");
+    var trans = db.transaction(CARDS);
+    var store = trans.objectStore(CARDS);
 
     var request = store.getAll();
     request.onsuccess = function() {
-        console.log("getTimePerCard transaction completed");
-        var items = groupByCards(request.result);
-        callback(items);
+        var items = request.result;
+        var ret = {};
+        items.forEach(function(v, k) {
+            ret[v.cardId] = {
+                "totalTime": v.totalTime,
+                "todayTime": getTodayTime(v.lastLogged, v.timeLogs)
+            };
+        });
+        callback(ret);
     }
+
+    trans.oncomplete = function(e) {
+        console.log("getCards transaction completed");
+    }
+    trans.onerror = idb.onerror;
 }
 
-exports.saveTime = saveTime;
-exports.getTimePerCard = getTimePerCard;
+function getTodayTime(lastLogged, timeLogs) {
+    var today = 0;
+    var now = new Date();
+
+    if (new Date(lastLogged).toDateString() !== now.toDateString()) {
+        return 0;
+    }
+
+    for (let i = timeLogs.length - 1; i >= 0; i--) {
+        let at = new Date(timeLogs[i].at);
+        if (at.toDateString() === now.toDateString()) {
+            today += timeLogs[i].time;
+        } else {
+            break;
+        }
+    }
+
+    return today;
+}
+
+exports.logTime = logTime;
+exports.getCards = getCards;

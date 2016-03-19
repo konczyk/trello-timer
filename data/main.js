@@ -2,7 +2,7 @@ var {PageMod} = require("sdk/page-mod");
 var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 
-var {saveTime, getTimePerCard} = require("./storage");
+var {logTime, getCards} = require("./storage");
 //require("./http_observer");
 
 PageMod({
@@ -21,9 +21,9 @@ PageMod({
     onAttach: function(worker) {
 
         function refresh(opts) {
-            getTimePerCard(function(time) {
+            getCards(function(cards) {
                 worker.port.emit("listsChanged",
-                                 {"time": time, "options": opts || {}});
+                                 {"cardsData": cards, "options": opts || {}});
             });
         }
 
@@ -31,16 +31,12 @@ PageMod({
             refresh();
         });
 
-        worker.port.on("cardOpen", function() {
-            worker.port.emit("cardOpen", null);
-        });
-
         worker.port.on("cardClose", function() {
             refresh();
         });
 
-        worker.port.on("logTime", function(logEntry) {
-            saveTime(logEntry);
+        worker.port.on("logTime", function(data) {
+            logTime(data);
         });
 
         // preferences changed

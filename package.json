@@ -1,19 +1,19 @@
 {
   "title": "Trello Timer",
   "name": "trello-timer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Adds time tracking to trello cards",
   "main": "data/main.js",
   "author": "Daniel kończyk",
   "engines": {
-    "firefox": ">=38.0a1"
+    "firefox": ">=45.0"
   },
   "license": "MIT",
   "id": "trellotimer@konczyk",
   "preferences": [
     {
       "name": "timer_badge_position",
-      "title": "Position of time icon on the card",
+      "title": "Position of the time badge on the card",
       "type": "menulist",
       "value": 0,
       "options": [
@@ -31,8 +31,7 @@
       "name": "enable_completed_card",
       "title": "Enable completed cards",
       "type": "bool",
-      "value": false,
-      "description": "Completed card is past due date and has completed checklist"
+      "value": false
     },
     {
       "name": "hide_desc_badge",

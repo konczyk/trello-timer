@@ -1,7 +1,3 @@
-self.port.on("cardOpen", function() {
-    setupCard();
-});
-
 (function(win) {
     "use strict";
 
@@ -14,7 +10,7 @@ self.port.on("cardOpen", function() {
     trackInterval = null,
     logRe = new RegExp(/^\s*log\s*`(\d{2}):([0-5]\d):([0-5]\d)`\s*$/);
 
-    win.setupCard = setupCard;
+    mutationObserver.listen("cardOpen", setupCard);
 
     function setupCard() {
         setCardId();
@@ -79,7 +75,6 @@ self.port.on("cardOpen", function() {
         area.value = "log `" +
             intervalToClock(new Date(trackStart), new Date()) +
             "`";
-
         addComment.removeAttribute("disabled");
         var counter = 0;
         var click = setInterval(function() {
@@ -99,17 +94,47 @@ self.port.on("cardOpen", function() {
     }
 
     function onComment() {
-        var area = document.querySelector(".new-comment .comment-box-input");
-        var matches = logRe.exec(area.value);
+        var target = ".card-detail-window .js-list-actions";
+        mutationObserver.attach(
+            target,
+            function(mutation) {
+                var added = mutation.addedNodes;
+                if (added.length === 1
+                        && added[0].classList.contains("mod-comment-type")) {
+                    mutationObserver.detach(target);
+                    parseComment(added[0]);
+                }
+            }
+        );
+    }
+
+    function parseComment(commentNode) {
+        var matches = logRe.exec(commentNode.querySelector("textarea").value);
         if (matches !== null) {
             let sec = parseInt(matches[1], 10) * 3600 +
                       parseInt(matches[2], 10) * 60 +
                       parseInt(matches[3], 10);
-            self.port.emit("logTime", {
-                card: cardId,
-                start: new Date(Date.now() - sec*1000),
-                end: new Date()
-            });
+            let waitCounter = 0;
+            let waitInterval = setInterval(function() {
+                let timeNode = commentNode.querySelector(".date");
+                if (timeNode !== null) {
+                    clearInterval(waitInterval);
+                    let dt = timeNode.getAttribute("dt");
+                    if (isNaN(Date.parse(dt))) {
+                        console.log("Invalid date to log: " + dt);
+                    }
+                    self.port.emit("logTime", {
+                        "cardId": cardId,
+                        "time": sec,
+                        "at": new Date(dt)
+                    });
+                } else if (waitCounter >= 1000) {
+                    clearInterval(waitInterval);
+                    console.log("Waiting for comment dt expired!");
+                }
+                waitCounter++;
+                console.log("Waiting for dt: " + waitCounter);
+            }, 50);
         }
     }
 
