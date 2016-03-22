@@ -34,13 +34,13 @@ self.port.on("listsChanged", function(logEntries) {
                 toggleCommentsBadge(cardNode);
                 toggleCompletedCard(cardNode);
             });
-            let header = getListHeaderIconNode(lists[i]);
+            let header = getListHeaderNode(lists[i]);
             let oldTotal = getListTotalNode(lists[i]);
             let newTotal = createListHeader(map, cardsData);
             if (oldTotal === null) {
-                header.parentNode.insertBefore(newTotal, header);
+                header.insertBefore(newTotal, header.lastChild);
             } else {
-                header.parentNode.replaceChild(newTotal, oldTotal);
+                header.replaceChild(newTotal, oldTotal);
             }
         }
     }
@@ -180,8 +180,8 @@ self.port.on("listsChanged", function(logEntries) {
         return document.querySelectorAll(".list");
     }
 
-    function getListHeaderIconNode(ctx) {
-        return ctx.querySelector(".list-header .icon-dropdown-menu");
+    function getListHeaderNode(ctx) {
+        return ctx.querySelector(".list-header");
     }
 
     function getListTotalNode(ctx) {
