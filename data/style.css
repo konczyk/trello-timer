@@ -12,9 +12,11 @@
 }
 
 .tt-list-total {
-    float: right; 
+    position: absolute;
     color: gray; 
     font-size: 13px;
+    right: 32px;
+    top: 7px;
 }
 
 .tt-hide {
