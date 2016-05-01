@@ -8,8 +8,8 @@ var {logTime, getCards} = require("./storage");
 PageMod({
     include: "https://trello.com/*",
     contentScriptFile: [
-        "./onload.js",
         "./utils.js",
+        "./onload.js",
         "./mutation_observer.js",
         "./board.js",
         "./card.js"
@@ -26,6 +26,10 @@ PageMod({
                                  {"cardsData": cards, "options": opts || {}});
             });
         }
+
+        worker.port.on("contentLoaded", function() {
+            refresh();
+        });
 
         worker.port.on("listsChange", function() {
             refresh();
