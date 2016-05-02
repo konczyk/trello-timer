@@ -23,7 +23,7 @@ idb.onupgradeneeded = function(e) {
     }
 }
 
-function logTime(data) {
+function logTime(data, callback) {
     var trans = db.transaction(CARDS, "readwrite");
     var store = trans.objectStore(CARDS);
     trans.oncomplete = function() {
@@ -41,6 +41,7 @@ function logTime(data) {
         putReq = store.put(card);
         putReq.onsuccess = function() {
             console.log("logTime puts a card " + JSON.stringify(card));
+            callback({"card": data.cardId, "dt": data.at});
         }
     }
 }

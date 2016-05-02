@@ -28,19 +28,25 @@ PageMod({
         }
 
         worker.port.on("contentLoaded", function() {
+            console.log("main: contentLoaded");
             refresh();
         });
 
         worker.port.on("listsChange", function() {
+            console.log("main: listsChange");
             refresh();
         });
 
         worker.port.on("cardClose", function() {
+            console.log("main: cardClose");
             refresh();
         });
 
         worker.port.on("logTime", function(data) {
-            logTime(data);
+            console.log("main: logTime");
+            logTime(data, function(info) {
+                worker.port.emit("loggedTime", info);
+            });
         });
 
         // preferences changed

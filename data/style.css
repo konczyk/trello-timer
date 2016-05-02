@@ -31,3 +31,7 @@
     border-radius: 3px;
     color: #fff;
 }
+
+.action-comment code.saved {
+    color: green;
+}
