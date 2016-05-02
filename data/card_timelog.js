@@ -9,10 +9,10 @@
         ;
 
         content.appendChild(buildTerm("Today"));
-        content.appendChild(buildDefinition(card.todayTime));
+        content.appendChild(buildDefinition(card ? card.todayTime : 0));
 
         content.appendChild(buildTerm("Total"));
-        content.appendChild(buildDefinition(card.totalTime));
+        content.appendChild(buildDefinition(card ? card.totalTime : 0));
 
         return html;
     }
