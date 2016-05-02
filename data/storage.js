@@ -39,12 +39,19 @@ function logTime(data, onSuccess, onError) {
         } else {
             card.timeLogs.push({"at": data.at, "time": data.time});
         }
-        card.lastLogged = card.timeLogs[card.timeLogs.length-1].at;
-        card.totalTime = getTotalTime(card.timeLogs);
-
-        putReq = store.put(card);
-        putReq.onsuccess = function() {
-            onSuccess(card);
+        if (card.timeLogs.length === 0) {
+            delReq = store.delete(data.cardId);
+            delReq.onsuccess = function() {
+                onSuccess(card);
+            }
+            delReq.onerror = onError;
+        } else {
+            card.lastLogged = card.timeLogs[card.timeLogs.length-1].at;
+            card.totalTime = getTotalTime(card.timeLogs);
+            putReq = store.put(card);
+            putReq.onsuccess = function() {
+                onSuccess(card);
+            }
         }
     }
 }
