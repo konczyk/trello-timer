@@ -72,7 +72,7 @@ function removeTime(data, onSuccess, onError) {
         }
 
         var idx = card.timeLogs.findIndex(function(element, index, array) {
-            if ((element.at || element.dt) !== data.at) {
+            if (element.at !== data.at) {
                 return false;
             }
             return true;
@@ -107,7 +107,7 @@ function removeTime(data, onSuccess, onError) {
 function getTotalTime(timeLog) {
     var total = 0;
     timeLog.forEach(function(val) {
-        total += val.time || val.tm;
+        total += val.time;
     });
 
     return total;
