@@ -3,7 +3,7 @@ var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 var notifications = require("sdk/notifications");
 
-var {logTime, removeTime, getCards} = require("./storage");
+var {logTime, removeTime, getCards, getCard} = require("./storage");
 //require("./http_observer");
 
 PageMod({
@@ -13,6 +13,7 @@ PageMod({
         "./onload.js",
         "./mutation_observer.js",
         "./board.js",
+        "./card_timelog.js",
         "./card.js"
     ],
     contentStyleFile: "./style.css",
@@ -21,26 +22,42 @@ PageMod({
     attachTo: ["existing", "top"],
     onAttach: function(worker) {
 
-        function refresh(opts) {
+        var openCardId = null;
+
+        function refreshBoard(opts) {
             getCards(function(cards) {
                 worker.port.emit("listsChanged",
                                  {"cardsData": cards, "options": opts || {}});
             });
         }
 
+        function refreshCard(opts) {
+            getCard(openCardId, function(card) {
+                worker.port.emit("cardChanged",
+                                 {"card": card, "options": opts || {}});
+            });
+        }
+
         worker.port.on("contentLoaded", function() {
             console.log("main: contentLoaded");
-            refresh();
+            refreshBoard();
         });
 
         worker.port.on("listsChange", function() {
             console.log("main: listsChange");
-            refresh();
+            refreshBoard();
+        });
+
+        worker.port.on("cardReady", function(data) {
+            console.log("main: cardReady " + data.cardId);
+            openCardId = data.cardId;
+            refreshCard(data.cardId);
         });
 
         worker.port.on("cardClose", function() {
             console.log("main: cardClose");
-            refresh();
+            openCardId = null;
+            refreshBoard();
         });
 
         worker.port.on("logTime", function(data) {
@@ -52,6 +69,7 @@ PageMod({
                         title: "Trello Timer",
                         text: "Tracked time successfully saved!",
                     });
+                    refreshCard();
                 },
                 function(e) {
                     console.log("logTime failure: " + e);
@@ -72,6 +90,7 @@ PageMod({
                         title: "Trello Timer",
                         text: "Tracked time successfully removed!",
                     });
+                    refreshCard();
                 },
                 function(e) {
                     console.log("removeTime failure: " + e);
@@ -86,7 +105,12 @@ PageMod({
         // preferences changed
         var prefSet = require("sdk/simple-prefs");
         prefSet.on("", function(key) {
-            refresh({"key": key, "value": prefSet.prefs[key]});
+            console.log(key);
+            console.log(openCardId);
+            refreshBoard({"key": key, "value": prefSet.prefs[key]});
+            if (openCardId !== null) {
+                refreshCard({"key": key, "value": prefSet.prefs[key]});
+            }
         });
     }
 });

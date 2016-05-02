@@ -1,5 +1,11 @@
+self.port.on("cardChanged", function(data) {
+    updateCard(data);
+});
+
 (function(win) {
     "use strict";
+
+    win.updateCard = updateCard;
 
     const TRACK_BUTTON_TEXT = " Track time";
     const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
@@ -9,12 +15,15 @@
     trackStart = null,
     trackInterval = null,
     commentButtonClicked = false,
-    logRe = new RegExp(/^\s*log\s*`(\d{2}):([0-5]\d):([0-5]\d)`\s*$/);
+    logRe = new RegExp(/^\s*log\s*`(\d{2}):([0-5]\d):([0-5]\d)`\s*$/),
+    options = {
+        "show_time_log_section": self.options.show_time_log_section
+    };
 
-    mutationObserver.listen("cardOpen", setupCard);
-
-    function setupCard() {
+    mutationObserver.listen("cardOpen", getCard);
+    function getCard() {
         setCardId();
+        self.port.emit("cardReady", {"cardId": cardId});
         setTrackButton();
         swapIcons(document.querySelector(".window-wrapper .window-sidebar"));
         trackStart = null;
@@ -23,6 +32,13 @@
             trackInterval = null;
         }
         attachEvents();
+    }
+
+    function updateCard(params) {
+        if (Object.keys(params.options).length > 0) {
+            options[params.options.key] = params.options.value;
+        }
+        insertTimeModule(params.card);
     }
 
     function setCardId() {
@@ -83,6 +99,42 @@
         }
     }
 
+    function onComment(mutation) {
+        var added = mutation.addedNodes;
+        var removed = mutation.removedNodes;
+        if (commentButtonClicked && added.length === 1
+                && added[0].classList.contains("mod-comment-type")) {
+            commentButtonClicked = false;
+            parseComment(added[0]);
+        }
+        if (removed.length === 1
+                && removed[0].classList.contains("mod-comment-type")) {
+            deleteTimeLog(removed[0]);
+        }
+    }
+
+    function insertTimeModule(card) {
+        var
+        newModule = getTimeModule(card),
+        oldModule = document.querySelector(
+            ".window-main-col .tt-time-log-section"
+        ),
+        beforeNode = document.querySelector(
+            ".window-main-col .add-comment-section")
+        ;
+
+        if (options.show_time_log_section) {
+            if (oldModule === null) {
+                beforeNode.parentNode.insertBefore(newModule,
+                                                   beforeNode.nextSibling);
+            } else {
+                beforeNode.parentNode.replaceChild(newModule, oldModule);
+            }
+        } else if (oldModule !== null) {
+            beforeNode.parentNode.removeChild(oldModule);
+        }
+    }
+
     function trackTime(e) {
         if (trackStart === null) {
             startTracking();
@@ -130,20 +182,6 @@
         emptyNode(trackButton);
         trackButton.appendChild(createClockIconNode());
         trackButton.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
-    }
-
-    function onComment(mutation) {
-        var added = mutation.addedNodes;
-        var removed = mutation.removedNodes;
-        if (commentButtonClicked && added.length === 1
-                && added[0].classList.contains("mod-comment-type")) {
-            commentButtonClicked = false;
-            parseComment(added[0]);
-        }
-        if (removed.length === 1
-                && removed[0].classList.contains("mod-comment-type")) {
-            deleteTimeLog(removed[0]);
-        }
     }
 
     function deleteTimeLog(commentNode) {

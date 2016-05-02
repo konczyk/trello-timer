@@ -26,7 +26,13 @@ card. The list heading displays time spent today on the whole list.
 
 ### Position of time icon on the card
 You can position the timer badge at the front or the end of the badge node.  
-Default is front (left side).
+Default is *front* (left side).
+
+### Show time log section
+Display short time log summary on the open card (before the Activity section).  
+Default is *false*
+
+![card list](img/section.png)
 
 ### Enable completed cards
 Changes display options for completed cards. Completed card is a card that has
@@ -35,17 +41,17 @@ the timer badge will only show the total time spent and both timer badge and
 due date badge will get a green background.  
 If the given lists contains completed cards only, the list header will display
 the total time spent.  
-Default is false
+Default is *false*
 
 ![card list](img/complete.png)
 
 ### Hide description icon
 Hides description icon in the list view.  
-Default is false
+Default is *false*
 
 ### Hide comment icon
 Hides comments icon in the list view.  
-Default is false
+Default is *false*
 
 ## Installation
 

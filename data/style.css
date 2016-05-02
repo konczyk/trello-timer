@@ -31,3 +31,27 @@
     border-radius: 3px;
     color: #fff;
 }
+
+.tt-time-log-section .u-gutter span {
+    margin-left: 3em;
+}
+
+.tt-time-log-section dl {
+    margin: 0;
+    padding: 0 0 10px 0;
+}
+
+.tt-time-log-section dt:after {
+    content: ": ";
+}
+
+.tt-time-log-section dt, .tt-time-log-section dd {
+    float: left;
+    margin: 0;
+    padding: 0 0 5px 0;
+}
+
+.tt-time-log-section dt {
+    clear: both;
+    min-width: 4em;
+}

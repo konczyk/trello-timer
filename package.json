@@ -28,6 +28,12 @@
       ]
     },
     {
+      "name": "show_time_log_section",
+      "title": "Show time log section",
+      "type": "bool",
+      "value": false
+    },
+    {
       "name": "enable_completed_card",
       "title": "Enable completed cards",
       "type": "bool",

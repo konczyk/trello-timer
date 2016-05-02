@@ -35,8 +35,8 @@ function logTime(data, onSuccess, onError) {
     getReq.onsuccess = function(e) {
         var card = getReq.result || createCard(data.cardId);
         card.lastLogged = data.at;
-        card.totalTime += data.time;
         card.timeLogs.push({"at": data.at, "time": data.time});
+        card.totalTime = getTotalTime(card.timeLogs);
 
         putReq = store.put(card);
         putReq.onsuccess = function() {
@@ -61,7 +61,7 @@ function removeTime(data, onSuccess, onError) {
         }
 
         var idx = card.timeLogs.findIndex(function(element, index, array) {
-            if (element.at !== data.at) {
+            if ((element.at || element.dt) !== data.at) {
                 return false;
             }
             return true;
@@ -81,7 +81,7 @@ function removeTime(data, onSuccess, onError) {
             }
             delReq.onerror = onError;
         } else {
-            card.lastLogged = card.timeLogs[0].at;
+            card.lastLogged = card.timeLogs[card.timeLogs.length-1].at;
             card.totalTime = getTotalTime(card.timeLogs);
             putReq = store.put(card);
             putReq.onsuccess = function() {
@@ -96,7 +96,7 @@ function removeTime(data, onSuccess, onError) {
 function getTotalTime(timeLog) {
     var total = 0;
     timeLog.forEach(function(val) {
-        total += val;
+        total += val.time || val.tm;
     });
 
     return total;
@@ -135,6 +135,28 @@ function getCards(callback) {
     trans.onerror = idb.onerror;
 }
 
+function getCard(cardId, callback) {
+    console.log("getCard started");
+    var trans = db.transaction(CARDS);
+    var store = trans.objectStore(CARDS);
+
+    var request = store.get(cardId);
+    request.onsuccess = function() {
+        var card = request.result;
+        if (card) {
+            card.todayTime = getTodayTime(card.lastLogged, card.timeLogs);
+        } else {
+            card = null;
+        }
+        callback(card);
+    }
+
+    trans.oncomplete = function(e) {
+        console.log("getCard " + cardId + " transaction completed");
+    }
+    trans.onerror = idb.onerror;
+}
+
 function getTodayTime(lastLogged, timeLogs) {
     var today = 0;
     var now = new Date();
@@ -158,3 +180,4 @@ function getTodayTime(lastLogged, timeLogs) {
 exports.logTime = logTime;
 exports.removeTime = removeTime;
 exports.getCards = getCards;
+exports.getCard = getCard;

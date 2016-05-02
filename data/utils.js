@@ -26,10 +26,10 @@ function createTimerBadgeNode() {
 }
 
 function intervalToClock(startTime, endTime) {
-    var diff = (endTime - startTime) / 1000;
-    var h = Math.floor(diff / 3600);
-    var m = Math.floor((diff %= 3600) / 60);
-    var s = Math.floor(diff % 60);
+    var diff = (endTime - startTime) / 1000,
+        h = Math.floor(diff / 3600),
+        m = Math.floor((diff %= 3600) / 60),
+        s = Math.floor(diff % 60);
     return (h <= 9 ? "0" : "") + h + ":" +
            (m <= 9 ? "0" : "") + m + ":" +
            (s <= 9 ? "0" : "") + s;
@@ -39,6 +39,16 @@ function intervalToMinClock(diff) {
     var h = parseFloat(diff / 1000 / 3600) % 24;
 
     return h.toFixed(1);
+}
+
+function secToHumanTime(sec) {
+    var h = Math.floor(sec / 3600),
+        m = Math.floor((sec %= 3600) / 60),
+        s = Math.floor(sec % 60);
+
+    return (h <= 9 ? "0" : "") + h + " h " +
+           (m <= 9 ? "0" : "") + m + " min. " +
+           (s <= 9 ? "0" : "") + s + " sec.";
 }
 
 function toHours(time) {
