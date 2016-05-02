@@ -3,7 +3,7 @@ var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 var notifications = require("sdk/notifications");
 
-var {logTime, getCards} = require("./storage");
+var {logTime, removeTime, getCards} = require("./storage");
 //require("./http_observer");
 
 PageMod({
@@ -58,6 +58,26 @@ PageMod({
                     notifications.notify({
                         title: "Trello Timer",
                         text: "Tracked time could not be saved",
+                    });
+                }
+            );
+        });
+
+        worker.port.on("removeTime", function(data) {
+            removeTime(
+                data,
+                function(card) {
+                    console.log("removeTime success: " + JSON.stringify(card));
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time successfully removed!",
+                    });
+                },
+                function(e) {
+                    console.log("removeTime failure: " + e);
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time could not be removed",
                     });
                 }
             );

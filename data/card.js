@@ -134,10 +134,27 @@
 
     function onComment(mutation) {
         var added = mutation.addedNodes;
+        var removed = mutation.removedNodes;
         if (commentButtonClicked && added.length === 1
                 && added[0].classList.contains("mod-comment-type")) {
             commentButtonClicked = false;
             parseComment(added[0]);
+        }
+        if (removed.length === 1
+                && removed[0].classList.contains("mod-comment-type")) {
+            deleteTimeLog(removed[0]);
+        }
+    }
+
+    function deleteTimeLog(commentNode) {
+        var contentNode = commentNode.querySelector(".current-comment p");
+        var text = contentNode.innerHTML.replace(/<.?code>/g, "`");
+        if (logRe.exec(text) !== null) {
+            let dt = commentNode.querySelector(".date").getAttribute("dt");
+            self.port.emit("removeTime", {
+                "cardId": cardId,
+                "at": new Date(dt)
+            });
         }
     }
 

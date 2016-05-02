@@ -44,6 +44,64 @@ function logTime(data, onSuccess, onError) {
         }
     }
 }
+
+function removeTime(data, onSuccess, onError) {
+    var trans = db.transaction(CARDS, "readwrite");
+    var store = trans.objectStore(CARDS);
+    trans.oncomplete = function() {
+        console.log("removeTime transaction completed");
+    }
+    trans.onerror = onError;
+
+    var getReq = store.get(data.cardId);
+    getReq.onsuccess = function(e) {
+        var card = getReq.result;
+        if (!card) {
+            return onError(new Error("removeTime card not found " + data.cardId));
+        }
+
+        var idx = card.timeLogs.findIndex(function(element, index, array) {
+            if (element.at !== data.at) {
+                return false;
+            }
+            return true;
+        });
+
+        if (idx === -1) {
+            return onError(new Error(
+                "removeTime dt " + data.at + " not found for " + data.cardId));
+        }
+
+        card.timeLogs.splice(idx, 1);
+
+        if (card.timeLogs.length === 0) {
+            delReq = store.delete(data.cardId);
+            delReq.onsuccess = function() {
+                onSuccess(card);
+            }
+            delReq.onerror = onError;
+        } else {
+            card.lastLogged = card.timeLogs[0].at;
+            card.totalTime = getTotalTime(card.timeLogs);
+            putReq = store.put(card);
+            putReq.onsuccess = function() {
+                onSuccess(card);
+            }
+            putReq.onerror = onError;
+        }
+    }
+    getReq.onerror = onError;
+}
+
+function getTotalTime(timeLog) {
+    var total = 0;
+    timeLog.forEach(function(val) {
+        total += val;
+    });
+
+    return total;
+}
+
 function createCard(cardId) {
     return {
         "cardId": cardId,
@@ -98,4 +156,5 @@ function getTodayTime(lastLogged, timeLogs) {
 }
 
 exports.logTime = logTime;
+exports.removeTime = removeTime;
 exports.getCards = getCards;
