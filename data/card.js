@@ -8,6 +8,7 @@
     trackButton = null,
     trackStart = null,
     trackInterval = null,
+    commentButtonClicked = false,
     logRe = new RegExp(/^\s*log\s*`(\d{2}):([0-5]\d):([0-5]\d)`\s*$/);
 
     mutationObserver.listen("cardOpen", setupCard);
@@ -42,6 +43,44 @@
 
         var container = document.querySelector(".other-actions .u-clearfix");
         container.insertBefore(trackButton, container.firstChild);
+    }
+
+    function attachEvents() {
+        var close = document.querySelector(".window-wrapper .dialog-close-button");
+        var overlay = document.querySelector(".window-overlay");
+        var comment = document.querySelector(".new-comment .confirm");
+        var comments = ".card-detail-window .js-list-actions";
+
+        mutationObserver.attach(
+            comments,
+            onComment
+        );
+
+        function onCommentButtonClick() {
+            commentButtonClicked = true;
+        }
+        comment.addEventListener("click", onCommentButtonClick);
+
+        function onCardClose() {
+            self.port.emit("cardClose", null);
+            removeListeners();
+        }
+        close.addEventListener("click", onCardClose);
+
+        function onOverlayClick() {
+            if (document.querySelector(".card-detail-window") === null) {
+                self.port.emit("cardClose", null);
+            }
+            removeListeners();
+        }
+        overlay.addEventListener("click", onOverlayClick);
+
+        function removeListeners() {
+            close.removeEventListener("click", onCardClose);
+            overlay.removeEventListener("click", onOverlayClick);
+            comment.removeEventListener("click", onCommentButtonClick);
+            mutationObserver.detach(comments);
+        }
     }
 
     function trackTime(e) {
@@ -93,19 +132,13 @@
         trackButton.appendChild(document.createTextNode(TRACK_BUTTON_TEXT));
     }
 
-    function onComment() {
-        var target = ".card-detail-window .js-list-actions";
-        mutationObserver.attach(
-            target,
-            function(mutation) {
-                var added = mutation.addedNodes;
-                if (added.length === 1
-                        && added[0].classList.contains("mod-comment-type")) {
-                    mutationObserver.detach(target);
-                    parseComment(added[0]);
-                }
-            }
-        );
+    function onComment(mutation) {
+        var added = mutation.addedNodes;
+        if (commentButtonClicked && added.length === 1
+                && added[0].classList.contains("mod-comment-type")) {
+            commentButtonClicked = false;
+            parseComment(added[0]);
+        }
     }
 
     function parseComment(commentNode) {
@@ -128,7 +161,7 @@
                         "time": sec,
                         "at": new Date(dt)
                     });
-                } else if (waitCounter >= 1000) {
+                } else if (waitCounter >= 5000) {
                     clearInterval(waitInterval);
                     console.log("Waiting for comment dt expired!");
                 }
@@ -136,24 +169,6 @@
                 console.log("Waiting for dt: " + waitCounter);
             }, 50);
         }
-    }
-
-    function attachEvents() {
-        var close = document.querySelector(".window-wrapper .dialog-close-button");
-        var overlay = document.querySelector(".window-overlay");
-        var comment = document.querySelector(".new-comment .confirm");
-
-        close.addEventListener("click", function() {
-            self.port.emit("cardClose", null);
-        });
-
-        overlay.addEventListener("click", function() {
-            if (document.querySelector(".card-detail-window") === null) {
-                self.port.emit("cardClose", null);
-            }
-        });
-
-        comment.addEventListener("click", onComment);
     }
 
 })(this);
