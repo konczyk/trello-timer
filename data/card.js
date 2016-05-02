@@ -86,8 +86,8 @@ self.port.on("cardChanged", function(data) {
         function onOverlayClick() {
             if (document.querySelector(".card-detail-window") === null) {
                 self.port.emit("cardClose", null);
+                removeListeners();
             }
-            removeListeners();
         }
         overlay.addEventListener("click", onOverlayClick);
 
