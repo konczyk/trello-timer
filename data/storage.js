@@ -34,8 +34,12 @@ function logTime(data, onSuccess, onError) {
     var getReq = store.get(data.cardId);
     getReq.onsuccess = function(e) {
         var card = getReq.result || createCard(data.cardId);
-        card.lastLogged = data.at;
-        card.timeLogs.push({"at": data.at, "time": data.time});
+        if (data.timeLogs) {
+            card.timeLogs = data.timeLogs;
+        } else {
+            card.timeLogs.push({"at": data.at, "time": data.time});
+        }
+        card.lastLogged = card.timeLogs[card.timeLogs.length-1].at;
         card.totalTime = getTotalTime(card.timeLogs);
 
         putReq = store.put(card);

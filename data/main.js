@@ -81,6 +81,27 @@ PageMod({
             );
         });
 
+        worker.port.on("syncTime", function(data) {
+            logTime(
+                data,
+                function(card) {
+                    console.log("syncTime success: " + JSON.stringify(card));
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time successfully synced!",
+                    });
+                    refreshCard();
+                },
+                function(e) {
+                    console.log("logTime failure: " + e);
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time could not be synced",
+                    });
+                }
+            );
+        });
+
         worker.port.on("removeTime", function(data) {
             removeTime(
                 data,

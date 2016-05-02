@@ -120,7 +120,8 @@ self.port.on("cardChanged", function(data) {
             ".window-main-col .tt-time-log-section"
         ),
         beforeNode = document.querySelector(
-            ".window-main-col .add-comment-section")
+            ".window-main-col .add-comment-section"),
+        syncLink = document.getElementById("tt-sync")
         ;
 
         if (options.show_time_log_section) {
@@ -130,9 +131,41 @@ self.port.on("cardChanged", function(data) {
             } else {
                 beforeNode.parentNode.replaceChild(newModule, oldModule);
             }
+            document.getElementById("tt-sync")
+                    .addEventListener("click", syncCard);
         } else if (oldModule !== null) {
             beforeNode.parentNode.removeChild(oldModule);
+            document.getElementById("tt-sync")
+                    .removeEventListener("click", syncCard);
         }
+    }
+
+    function syncCard(e) {
+        var root = ".card-detail-window .mod-comment-type",
+            comments = document.querySelectorAll(root),
+            timeLogs = [];
+
+        for (let i = 0; i < comments.length; i++) {
+            let text = comments[i].querySelector(".current-comment p")
+                                  .innerHTML.replace(/<.?code>/g, "`");
+            let matches = logRe.exec(text);
+            if (matches) {
+                let sec = matchesToSec(matches);
+                let dt = comments[i].querySelector(".date").getAttribute("dt");
+                if (isNaN(Date.parse(dt))) {
+                    console.log("Invalid date to log: " + dt);
+                } else {
+                    timeLogs.push({at: new Date(dt), time: sec});
+                }
+            }
+        }
+        timeLogs.reverse();
+        self.port.emit("syncTime", {
+            "cardId": cardId,
+            "timeLogs": timeLogs
+        });
+
+        e.preventDefault();
     }
 
     function trackTime(e) {
@@ -199,9 +232,7 @@ self.port.on("cardChanged", function(data) {
     function parseComment(commentNode) {
         var matches = logRe.exec(commentNode.querySelector("textarea").value);
         if (matches !== null) {
-            let sec = parseInt(matches[1], 10) * 3600 +
-                      parseInt(matches[2], 10) * 60 +
-                      parseInt(matches[3], 10);
+            let sec = matchesToSec(matches);
             let waitCounter = 0;
             let waitInterval = setInterval(function() {
                 let timeNode = commentNode.querySelector(".date");
@@ -224,6 +255,12 @@ self.port.on("cardChanged", function(data) {
                 console.log("Waiting for dt: " + waitCounter);
             }, 50);
         }
+    }
+
+    function matchesToSec(matches) {
+        return parseInt(matches[1], 10) * 3600 +
+               parseInt(matches[2], 10) * 60 +
+               parseInt(matches[3], 10);
     }
 
 })(this);

@@ -19,11 +19,13 @@
 
     function buildTimeModule() {
         var d1 = document.createElement("div"),
-            d2 = document.createElement("div"),
+            d2 = d1.cloneNode(),
             icon = document.createElement("span"),
             title = document.createElement("h3"),
-            content = document.createElement("div"),
-            list = document.createElement("dl")
+            content = d1.cloneNode(),
+            list = document.createElement("dl"),
+            linkOuter = d1.cloneNode(),
+            link = document.createElement("a")
         ;
 
         d1.classList.add("window-module", "tt-time-log-section");
@@ -35,12 +37,19 @@
                            "icon-clock");
         d2.appendChild(icon);
 
-        title.textContent = "Time log";
+        title.appendChild(document.createTextNode("Time log"));
         d2.appendChild(title);
 
         content.classList.add("u-gutter");
         content.appendChild(list);
         d1.appendChild(content);
+
+        link.setAttribute("href","#");
+        link.setAttribute("id", "tt-sync");
+        link.classList.add("quiet");
+        link.textContent = "sync";
+        linkOuter.appendChild(link);
+        content.appendChild(linkOuter);
 
         return d1;
     }

@@ -29,7 +29,9 @@ You can position the timer badge at the front or the end of the badge node.
 Default is *front* (left side).
 
 ### Show time log section
-Display short time log summary on the open card (before the Activity section).  
+Displays short time log summary on the open card (before the Activity section).
+Clicking *sync* overwrites database data with data taken from comments (all
+comments must be visible).  
 Default is *false*
 
 ![card list](img/section.png)
