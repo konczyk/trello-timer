@@ -1,6 +1,7 @@
 var {PageMod} = require("sdk/page-mod");
 var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
+var notifications = require("sdk/notifications");
 
 var {logTime, getCards} = require("./storage");
 //require("./http_observer");
@@ -43,10 +44,23 @@ PageMod({
         });
 
         worker.port.on("logTime", function(data) {
-            console.log("main: logTime");
-            logTime(data, function(info) {
-                worker.port.emit("loggedTime", info);
-            });
+            logTime(
+                data,
+                function(card) {
+                    console.log("logTime success: " + JSON.stringify(card));
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time successfully saved!",
+                    });
+                },
+                function(e) {
+                    console.log("logTime failure: " + e);
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked time could not be saved",
+                    });
+                }
+            );
         });
 
         // preferences changed

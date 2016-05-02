@@ -1,11 +1,5 @@
-self.port.on("loggedTime", function(info) {
-    confirmLoggedTime(info);
-});
-
 (function(win) {
     "use strict";
-
-    win.confirmLoggedTime = confirmLoggedTime;
 
     const TRACK_BUTTON_TEXT = " Track time";
     const TRACK_BUTTON_ACTIVE_CLASS = "tt-active";
@@ -18,19 +12,6 @@ self.port.on("loggedTime", function(info) {
     logRe = new RegExp(/^\s*log\s*`(\d{2}):([0-5]\d):([0-5]\d)`\s*$/);
 
     mutationObserver.listen("cardOpen", setupCard);
-
-    function confirmLoggedTime(info) {
-        var comments = document.querySelectorAll(
-                        ".window-module .mod-comment-type");
-        for (let i = 0; i < comments.length; i++) {
-            let date = comments[i].querySelector(".phenom-meta .date");
-            if (date !== null && date.getAttribute("dt") === info.dt) {
-                let code = comments[i].querySelector(".current-comment code");
-                code.classList.add("saved");
-                break;
-            }
-        }
-    }
 
     function setupCard() {
         setCardId();
