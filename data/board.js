@@ -18,6 +18,10 @@ self.port.on("listsChanged", function(logEntries) {
     },
     cardRe = new RegExp(/^\/c\/([A-Za-z0-9]{8,})\/.*$/);
 
+    mutationObserver.listen("cardAdded", function(card) {
+        addTimerBadges(card);
+    });
+
     function updateLists(params) {
         if (Object.keys(params.options).length > 0) {
             options[params.options.key] = params.options.value;
