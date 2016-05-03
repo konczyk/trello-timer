@@ -112,6 +112,9 @@ self.port.on("listsChanged", function(logEntries) {
             text.replaceChild(formatHours(today, total), text.firstChild);
             toggleTimerBadge(cardNode);
         }
+        if (today > 0) {
+            badge.classList.add("tt-tracked-today");
+        }
         badge.dataset.today = today;
         badge.dataset.total = total;
     }
