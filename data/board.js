@@ -70,7 +70,9 @@ self.port.on("listsChanged", function(logEntries) {
         var cards = listContainer.querySelectorAll(".list-card-details");
         for (let i = 0; i < cards.length; i++) {
             let cardLink = getCardUrlNode(cards[i]);
-            map.set(extractCardId(cardLink), cards[i]);
+            if (cardLink !== null) {
+                map.set(extractCardId(cardLink), cards[i]);
+            }
         }
 
         return map;
