@@ -39,6 +39,7 @@ self.port.on("cardChanged", function(data) {
             options[params.options.key] = params.options.value;
         }
         insertTimeModule(params.card);
+        autostartUnsaved(params.card);
     }
 
     function setCardId() {
@@ -143,6 +144,16 @@ self.port.on("cardChanged", function(data) {
             beforeNode.parentNode.removeChild(oldModule);
             document.getElementById("tt-sync")
                     .removeEventListener("click", syncCard);
+        }
+    }
+
+    function autostartUnsaved(card) {
+        if (card === null
+                || !Number.isInteger(card.unsaved)
+                || card.unsaved === 0) {
+            return;
+        } else {
+            startTracking(new Date(Date.now() - card.unsaved * 1000));
         }
     }
 
