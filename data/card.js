@@ -78,15 +78,21 @@ self.port.on("cardChanged", function(data) {
         comment.addEventListener("click", onCommentButtonClick);
 
         function onCardClose() {
-            self.port.emit("cardClose", null);
+            var unsaved = null;
+            if (trackStart !== null) {
+                unsaved = parseInt((new Date() - trackStart) / 1000, 10);
+            }
+            self.port.emit("cardClose", {
+                "cardId": cardId,
+                "unsaved": unsaved
+            });
             removeListeners();
         }
         close.addEventListener("click", onCardClose);
 
         function onOverlayClick() {
             if (document.querySelector(".card-detail-window") === null) {
-                self.port.emit("cardClose", null);
-                removeListeners();
+                onCardClose();
             }
         }
         overlay.addEventListener("click", onOverlayClick);
@@ -105,7 +111,7 @@ self.port.on("cardChanged", function(data) {
         if (commentButtonClicked && added.length === 1
                 && added[0].classList.contains("mod-comment-type")) {
             commentButtonClicked = false;
-            parseComment(added[0]);
+            logTime(added[0]);
         }
         if (removed.length === 1
                 && removed[0].classList.contains("mod-comment-type")) {
@@ -229,7 +235,7 @@ self.port.on("cardChanged", function(data) {
         }
     }
 
-    function parseComment(commentNode) {
+    function logTime(commentNode) {
         var matches = logRe.exec(commentNode.querySelector("textarea").value);
         if (matches !== null) {
             let sec = matchesToSec(matches);
@@ -237,7 +243,6 @@ self.port.on("cardChanged", function(data) {
             let waitInterval = setInterval(function() {
                 let timeNode = commentNode.querySelector(".date");
                 if (timeNode !== null) {
-                    self.port.emit("logTimeExpired");
                     clearInterval(waitInterval);
                     let dt = timeNode.getAttribute("dt");
                     if (isNaN(Date.parse(dt))) {

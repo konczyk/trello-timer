@@ -99,11 +99,12 @@ self.port.on("listsChanged", function(logEntries) {
     }
 
     function addTimerBadges(cardNode, cardData) {
-        var today = cardData ? cardData.todayTime : 0;
-        var total = cardData ? cardData.totalTime : 0;
-        var oldBadge = getTimerBadgeNode(cardNode);
-        var badge = oldBadge || createTimerBadgeNode();
-        var text = getTimerBadgeText(badge);
+        var today = cardData ? cardData.todayTime : 0,
+            total = cardData ? cardData.totalTime : 0,
+            unsaved = cardData ? cardData.unsaved : null,
+            oldBadge = getTimerBadgeNode(cardNode),
+            badge = oldBadge || createTimerBadgeNode(),
+            text = getTimerBadgeText(badge);
 
         if (!oldBadge) {
             text.appendChild(formatHours(today, total));
@@ -112,20 +113,23 @@ self.port.on("listsChanged", function(logEntries) {
             text.replaceChild(formatHours(today, total), text.firstChild);
             toggleTimerBadge(cardNode);
         }
-        if (today > 0) {
-            badge.classList.add("tt-tracked-today");
-        }
+
+        badge.classList.toggle("tt-tracked-today", today > 0);
+        badge.classList.toggle("tt-unsaved", Number.isInteger(unsaved));
+
         badge.dataset.today = today;
         badge.dataset.total = total;
     }
 
     function toggleTimerBadge(cardNode, newBadge) {
-        var badgesNode = getBadgesNode(cardNode);
-        var badgeNode = newBadge || getTimerBadgeNode(badgesNode);
-        var index = 0;
+        var badgesNode = getBadgesNode(cardNode),
+            badgeNode = newBadge || getTimerBadgeNode(badgesNode),
+            index = 0;
+
         if (options.timer_badge_position === TIME_ICON_POSITION_LAST) {
             index = badgesNode.childNodes.length - 1;
         }
+
         badgesNode.insertBefore(badgeNode, badgesNode.childNodes[index]);
     }
 

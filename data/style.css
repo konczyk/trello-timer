@@ -67,3 +67,8 @@
     color: #3a8e29;
     font-weight: bold;
 }
+
+.tt-unsaved, .tt-unsaved .badge-icon {
+    color: #b84a38;
+    font-weight: bold;
+}

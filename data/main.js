@@ -3,7 +3,8 @@ var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 var notifications = require("sdk/notifications");
 
-var {logTime, removeTime, getCards, getCard} = require("./storage");
+var {logTime, logUnsavedTime, removeTime} = require("./storage");
+var {getCards, getCard} = require("./storage");
 //require("./http_observer");
 
 PageMod({
@@ -54,8 +55,11 @@ PageMod({
             refreshCard(data.cardId);
         });
 
-        worker.port.on("cardClose", function() {
-            console.log("main: cardClose");
+        worker.port.on("cardClose", function(card) {
+            console.log("main: cardClose" + JSON.stringify(card));
+            if (card.unsaved !== null) {
+                logUnsavedTime(card);
+            }
             openCardId = null;
             refreshBoard();
         });
@@ -84,7 +88,8 @@ PageMod({
         worker.port.on("logTimeExpired", function(data) {
             notifications.notify({
                 title: "Trello Timer",
-                text: "Tracked time could not be saved, time expired! Try syncing your data",
+                text: "Tracked time could not be saved, time expired! " +
+                      "Try syncing your data",
             });
         });
 

@@ -48,11 +48,28 @@ function logTime(data, onSuccess, onError) {
         } else {
             card.lastLogged = card.timeLogs[card.timeLogs.length-1].at;
             card.totalTime = getTotalTime(card.timeLogs);
+            card.unsaved = null;
             putReq = store.put(card);
             putReq.onsuccess = function() {
                 onSuccess(card);
             }
         }
+    }
+}
+
+function logUnsavedTime(data, onSuccess) {
+    var trans = db.transaction(CARDS, "readwrite");
+    var store = trans.objectStore(CARDS);
+    trans.oncomplete = function() {
+        console.log("logUnsavedTime transaction completed");
+    }
+    trans.onerror = idb.onerror;
+
+    var getReq = store.get(data.cardId);
+    getReq.onsuccess = function(e) {
+        var card = getReq.result || createCard(data.cardId);
+        card.unsaved = data.unsaved;
+        putReq = store.put(card);
     }
 }
 
@@ -117,6 +134,7 @@ function createCard(cardId) {
     return {
         "cardId": cardId,
         "lastLogged": null,
+        "unsaved": null,
         "totalTime": 0,
         "timeLogs": []
     };
@@ -133,6 +151,7 @@ function getCards(callback) {
         var ret = {};
         items.forEach(function(v, k) {
             ret[v.cardId] = {
+                "unsaved": v.unsaved || null,
                 "totalTime": v.totalTime,
                 "todayTime": getTodayTime(v.lastLogged, v.timeLogs)
             };
@@ -189,6 +208,7 @@ function getTodayTime(lastLogged, timeLogs) {
 }
 
 exports.logTime = logTime;
+exports.logUnsavedTime = logUnsavedTime;
 exports.removeTime = removeTime;
 exports.getCards = getCards;
 exports.getCard = getCard;
