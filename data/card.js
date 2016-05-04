@@ -237,6 +237,7 @@ self.port.on("cardChanged", function(data) {
             let waitInterval = setInterval(function() {
                 let timeNode = commentNode.querySelector(".date");
                 if (timeNode !== null) {
+                    self.port.emit("logTimeExpired");
                     clearInterval(waitInterval);
                     let dt = timeNode.getAttribute("dt");
                     if (isNaN(Date.parse(dt))) {
@@ -247,9 +248,10 @@ self.port.on("cardChanged", function(data) {
                         "time": sec,
                         "at": new Date(dt)
                     });
-                } else if (waitCounter >= 5000) {
+                } else if (waitCounter >= 10000) {
                     clearInterval(waitInterval);
                     console.log("Waiting for comment dt expired!");
+                    self.port.emit("logTimeExpired");
                 }
                 waitCounter++;
                 console.log("Waiting for dt: " + waitCounter);

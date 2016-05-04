@@ -81,6 +81,13 @@ PageMod({
             );
         });
 
+        worker.port.on("logTimeExpired", function(data) {
+            notifications.notify({
+                title: "Trello Timer",
+                text: "Tracked time could not be saved, time expired! Try syncing your data",
+            });
+        });
+
         worker.port.on("syncTime", function(data) {
             logTime(
                 data,
