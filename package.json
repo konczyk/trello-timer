@@ -1,10 +1,11 @@
 {
   "title": "Trello Timer",
   "name": "trello-timer",
-  "version": "0.0.7",
+  "version": "0.1",
   "description": "Adds time tracking to trello cards",
   "main": "data/main.js",
   "author": "Daniel kończyk",
+  "homepage": "https://github.com/konczyk/trello-timer",
   "engines": {
     "firefox": ">=45.0"
   },
