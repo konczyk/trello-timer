@@ -65,8 +65,14 @@ function formatTotalHours(today, total) {
     return document.createTextNode(toHours(total));
 }
 
-function formatTodayHours(today, total) {
-    return document.createTextNode(toHours(today));
+function formatTodayHours(today, total, estimate) {
+    today = toHours(today);
+    estimate = estimate && estimate > 0 ? toHours(estimate) : null;
+    if (estimate === null) {
+        return document.createTextNode(toHours(today));
+    } else {
+        return document.createTextNode(today + ' | ' + estimate);
+    }
 }
 
 function emptyNode(node) {

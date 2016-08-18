@@ -159,8 +159,6 @@ PageMod({
         // preferences changed
         var prefSet = require("sdk/simple-prefs");
         prefSet.on("", function(key) {
-            console.log(key);
-            console.log(openCardId);
             refreshBoard({"key": key, "value": prefSet.prefs[key]});
             if (openCardId !== null) {
                 refreshCard({"key": key, "value": prefSet.prefs[key]});

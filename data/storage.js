@@ -174,7 +174,8 @@ function getCards(callback) {
             ret[v.cardId] = {
                 "unsaved": v.unsaved || null,
                 "totalTime": v.totalTime,
-                "todayTime": getTodayTime(v.lastLogged, v.timeLogs)
+                "todayTime": getTodayTime(v.lastLogged, v.timeLogs),
+                "estimatedTime": v.estimatedTime || 0
             };
         });
         callback(ret);
