@@ -60,7 +60,7 @@
 
 .tt-time-log-section dt {
     clear: both;
-    min-width: 4em;
+    min-width: 5em;
 }
 
 .tt-tracked-today, .tt-tracked-today .badge-icon {

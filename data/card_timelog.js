@@ -14,6 +14,11 @@
         content.appendChild(buildTerm("Total"));
         content.appendChild(buildDefinition(card ? card.totalTime : 0));
 
+        if (card.estimatedTime > 0) {
+            content.appendChild(buildTerm("Estimate"));
+            content.appendChild(buildDefinition(card.estimatedTime));
+        }
+
         return html;
     }
 
