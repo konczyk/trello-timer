@@ -3,7 +3,7 @@ var self = require("sdk/self");
 var {prefs} = require("sdk/simple-prefs");
 var notifications = require("sdk/notifications");
 
-var {logTime, logUnsavedTime, removeTime} = require("./storage");
+var {logTime, logEstimate, logUnsavedTime, removeTime} = require("./storage");
 var {getCards, getCard} = require("./storage");
 //require("./http_observer");
 
@@ -91,6 +91,27 @@ PageMod({
                 text: "Tracked time could not be saved, time expired! " +
                       "Try syncing your data",
             });
+        });
+
+        worker.port.on("logEstimate", function(data) {
+            logEstimate(
+                data,
+                function(card) {
+                    console.log("logEstimate success: " + JSON.stringify(card));
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked estimate successfully saved!",
+                    });
+                    refreshCard();
+                },
+                function(e) {
+                    console.log("logEstimate failure: " + e);
+                    notifications.notify({
+                        title: "Trello Timer",
+                        text: "Tracked estimate could not be saved",
+                    });
+                }
+            );
         });
 
         worker.port.on("syncTime", function(data) {

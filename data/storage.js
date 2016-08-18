@@ -57,6 +57,26 @@ function logTime(data, onSuccess, onError) {
     }
 }
 
+function logEstimate(data, onSuccess, onError) {
+    var trans = db.transaction(CARDS, "readwrite");
+    var store = trans.objectStore(CARDS);
+    trans.oncomplete = function() {
+        console.log("logEstimate transaction completed");
+    }
+    trans.onerror = onError;
+
+    var getReq = store.get(data.cardId);
+    getReq.onsuccess = function(e) {
+        var card = getReq.result || createCard(data.cardId);
+        card.estimatedTime = data.time
+        putReq = store.put(card);
+        putReq.onsuccess = function() {
+            onSuccess(card);
+        }
+    }
+}
+
+
 function logUnsavedTime(data, onSuccess) {
     var trans = db.transaction(CARDS, "readwrite");
     var store = trans.objectStore(CARDS);
@@ -136,6 +156,7 @@ function createCard(cardId) {
         "lastLogged": null,
         "unsaved": null,
         "totalTime": 0,
+        "estimatedTime": 0,
         "timeLogs": []
     };
 }
@@ -208,6 +229,7 @@ function getTodayTime(lastLogged, timeLogs) {
 }
 
 exports.logTime = logTime;
+exports.logEstimate = logEstimate;
 exports.logUnsavedTime = logUnsavedTime;
 exports.removeTime = removeTime;
 exports.getCards = getCards;
