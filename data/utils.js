@@ -12,7 +12,13 @@ const BADGE = (function() {
     icon.classList.add("badge-icon");
     b.appendChild(icon);
     var t = document.createElement("span");
-    t.classList.add("badge-text");
+    t.classList.add("badge-text", "badge-text-today");
+    b.appendChild(t);
+    t = document.createElement("span");
+    t.classList.add("badge-text", "badge-text-total");
+    b.appendChild(t);
+    t = document.createElement("span");
+    t.classList.add("badge-text", "badge-text-estimate");
     b.appendChild(t);
     return b;
 })();
@@ -55,10 +61,8 @@ function toHours(time) {
     return (time / 3600).toFixed(1);
 }
 
-function formatHours(today, total) {
-    return document.createTextNode(
-        toHours(today) + " [" + toHours(total) + "]"
-    );
+function formatHours(el) {
+    return document.createTextNode(toHours(el));
 }
 
 function formatTotalHours(today, total) {

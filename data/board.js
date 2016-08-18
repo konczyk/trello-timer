@@ -102,26 +102,43 @@ self.port.on("listsChanged", function(logEntries) {
     }
 
     function addTimerBadges(cardNode, cardData) {
-        var today = cardData ? cardData.todayTime : 0,
-            total = cardData ? cardData.totalTime : 0,
-            unsaved = cardData ? cardData.unsaved : null,
+        var unsaved = cardData ? cardData.unsaved : null,
             oldBadge = getTimerBadgeNode(cardNode),
-            badge = oldBadge || createTimerBadgeNode(),
-            text = getTimerBadgeText(badge);
+            badge = oldBadge || createTimerBadgeNode();
+
+        badge.dataset.today = cardData ? cardData.todayTime : 0;
+        badge.dataset.total = cardData ? cardData.totalTime : 0;
+        badge.dataset.estimate = cardData ? cardData.estimatedTime : 0;
+
+        updateTimerBadge(badge, oldBadge);
+        toggleTimerBadge(cardNode, !oldBadge ? badge : null);
+
+        badge.classList.toggle("tt-tracked-today", badge.dataset.today > 0);
+        badge.classList.toggle("tt-unsaved", Number.isInteger(unsaved));
+    }
+
+    function updateTimerBadge(badge, oldBadge) {
+        var today = getTimerBadgeToday(badge),
+            total = getTimerBadgeTotal(badge),
+            estimate = getTimerBadgeEstimate(badge);
 
         if (!oldBadge) {
-            text.appendChild(formatHours(today, total));
-            toggleTimerBadge(cardNode, badge);
+            today.appendChild(formatHours(badge.dataset.today));
+            total.appendChild(formatHours(badge.dataset.total));
+            if (badge.dataset.estimate > 0) {
+                estimate.appendChild(formatHours(badge.dataset.estimate));
+            } else {
+                estimate.textContent = "";
+            }
         } else {
-            text.replaceChild(formatHours(today, total), text.firstChild);
-            toggleTimerBadge(cardNode);
+            today.replaceChild(formatHours(badge.dataset.today),
+                               today.firstChild);
+            total.replaceChild(formatHours(badge.dataset.total),
+                               total.firstChild);
+            estimate.replaceChild(
+                badge.dataset.estimate > 0 ? formatHours(badge.dataset.estimate) : "",
+                estimate.firstChild);
         }
-
-        badge.classList.toggle("tt-tracked-today", today > 0);
-        badge.classList.toggle("tt-unsaved", Number.isInteger(unsaved));
-
-        badge.dataset.today = today;
-        badge.dataset.total = total;
     }
 
     function toggleTimerBadge(cardNode, newBadge) {
@@ -163,9 +180,9 @@ self.port.on("listsChanged", function(logEntries) {
     }
 
     function toggleCompletedCard(cardNode) {
-        var enabled = options.enable_completed_card;
-        var checkIcon = getChecklistIconNode(cardNode);
-        var dueIcon = getDueDateIconNode(cardNode);
+        let enabled = options.enable_completed_card,
+            checkIcon = getChecklistIconNode(cardNode),
+            dueIcon = getDueDateIconNode(cardNode);
 
         if (!checkIcon || !dueIcon || !enabled) {
             enabled = false;
@@ -175,20 +192,19 @@ self.port.on("listsChanged", function(logEntries) {
             enabled = checklist && dueDate;
         }
 
-        var timer = getTimerBadgeNode(cardNode);
-        var timerText = getTimerBadgeText(timer);
-        var cardComplete = isCardComplete(cardNode);
+        let timer = getTimerBadgeNode(cardNode),
+            timerToday = getTimerBadgeToday(timer),
+            timerEstimate = getTimerBadgeEstimate(timer),
+            cardComplete = isCardComplete(cardNode);
 
         if (enabled) {
-            let newTime = formatTotalHours(timer.dataset.today,
-                                           timer.dataset.total);
             markCardCompleted(cardNode);
-            timerText.replaceChild(newTime, timerText.firstChild);
+            timerToday.classList.toggle("hide");
+            timerEstimate.classList.toggle("hide");
         } else if (cardComplete) {
-            let newTime = formatHours(timer.dataset.today,
-                                      timer.dataset.total);
             markCardNotCompleted(cardNode);
-            timerText.replaceChild(newTime, timerText.firstChild);
+            timerToday.classList.toggle("hide");
+            timerEstimate.classList.toggle("hide");
         }
     }
 
@@ -251,8 +267,16 @@ self.port.on("listsChanged", function(logEntries) {
         return ctx.querySelector(".timer-badge");
     }
 
-    function getTimerBadgeText(ctx) {
-        return ctx.querySelector(".badge-text");
+    function getTimerBadgeToday(ctx) {
+        return ctx.querySelector(".badge-text-today");
+    }
+
+    function getTimerBadgeTotal(ctx) {
+        return ctx.querySelector(".badge-text-total");
+    }
+
+    function getTimerBadgeEstimate(ctx) {
+        return ctx.querySelector(".badge-text-estimate");
     }
 
     function getClockIconNodes(ctx) {

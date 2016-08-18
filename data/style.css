@@ -72,3 +72,15 @@
     color: #b84a38;
     font-weight: bold;
 }
+
+.badge-text-today {
+    padding-right: 5px;
+}
+
+.badge-text-total {
+    color: #51a5ba;
+}
+
+.badge-text-estimate {
+    color: #fe8402;
+}
