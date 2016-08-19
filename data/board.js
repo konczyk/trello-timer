@@ -128,7 +128,7 @@ self.port.on("listsChanged", function(logEntries) {
             if (badge.dataset.estimate > 0) {
                 estimate.appendChild(formatHours(badge.dataset.estimate));
             } else {
-                estimate.textContent = "";
+                estimate.appendChild(document.createTextNode(""));
             }
         } else {
             today.replaceChild(formatHours(badge.dataset.today),
@@ -136,7 +136,9 @@ self.port.on("listsChanged", function(logEntries) {
             total.replaceChild(formatHours(badge.dataset.total),
                                total.firstChild);
             estimate.replaceChild(
-                badge.dataset.estimate > 0 ? formatHours(badge.dataset.estimate) : "",
+                badge.dataset.estimate > 0 ?
+                    formatHours(badge.dataset.estimate) :
+                    document.createTextNode(""),
                 estimate.firstChild);
         }
     }
