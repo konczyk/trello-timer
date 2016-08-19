@@ -201,12 +201,12 @@ self.port.on("listsChanged", function(logEntries) {
 
         if (enabled) {
             markCardCompleted(cardNode);
-            timerToday.classList.toggle("hide");
-            timerEstimate.classList.toggle("hide");
+            timerToday.classList.add("hide");
+            timerEstimate.classList.add("hide");
         } else if (cardComplete) {
             markCardNotCompleted(cardNode);
-            timerToday.classList.toggle("hide");
-            timerEstimate.classList.toggle("hide");
+            timerToday.classList.remove("hide");
+            timerEstimate.classList.remove("hide");
         }
     }
 
