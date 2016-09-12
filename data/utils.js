@@ -71,7 +71,7 @@ function formatTotalHours(today, total) {
 
 function formatTodayHours(today, total, estimate) {
     today = toHours(today);
-    estimate = estimate && estimate > 0 ? toHours(estimate) : null;
+    estimate = estimate && estimate > 0 ? toHours(estimate - total) : null;
     if (estimate === null) {
         return document.createTextNode(today);
     } else {
