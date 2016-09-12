@@ -73,7 +73,7 @@ function formatTodayHours(today, total, estimate) {
     today = toHours(today);
     estimate = estimate && estimate > 0 ? toHours(estimate) : null;
     if (estimate === null) {
-        return document.createTextNode(toHours(today));
+        return document.createTextNode(today);
     } else {
         return document.createTextNode(today + ' | ' + estimate);
     }
