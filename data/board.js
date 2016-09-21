@@ -53,17 +53,22 @@ self.port.on("listsChanged", function(logEntries) {
         var today = 0;
         var total = 0;
         var estimate = 0;
+        var listComplete = isListComplete(cardMap);
         cardMap.forEach(function(cardNode, cardId) {
-            today += (cardsData[cardId] ? cardsData[cardId].todayTime : 0);
-            total += (cardsData[cardId] ? cardsData[cardId].totalTime : 0);
-            estimate += (cardsData[cardId] ? cardsData[cardId].estimatedTime : 0);
+            let hasData = cardsData[cardId];
+            let cardComplete = isCardComplete(cardNode);
+            today += (hasData ? cardsData[cardId].todayTime : 0);
+            total += (hasData && (!cardComplete || listComplete) ?
+                cardsData[cardId].totalTime : 0);
+            estimate += (hasData && !cardComplete ?
+                cardsData[cardId].estimatedTime : 0);
         });
         let el = document.createElement("span");
         el.classList.add("tt-list-total");
         el.dataset.total = total;
         el.dataset.today = today;
         el.dataset.estimate = estimate;
-        if (isListComplete(cardMap)) {
+        if (listComplete) {
             el.appendChild(formatTotalHours(today, total));
         } else {
             el.appendChild(formatTodayHours(today, total, estimate));
