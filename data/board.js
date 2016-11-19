@@ -156,17 +156,8 @@ self.port.on("listsChanged", function(logEntries) {
     }
 
     function toggleCompletedCard(cardNode) {
-        let enabled = options.enable_completed_card,
-            checkIcon = getChecklistIconNode(cardNode),
-            dueIcon = getDueDateIconNode(cardNode);
-
-        if (!checkIcon || !dueIcon || !enabled) {
-            enabled = false;
-        } else {
-            let checklist = isChecklistCompleteBadge(checkIcon.parentNode);
-            let dueDate = isDueDatePastBadge(dueIcon.parentNode);
-            enabled = checklist && dueDate;
-        }
+        let enabled = options.enable_completed_card
+                        && cardNode.querySelector('.is-due-complete') !== null;
 
         let timer = getTimerBadgeNode(cardNode),
             timerToday = getTimerBadgeToday(timer),
@@ -226,15 +217,6 @@ self.port.on("listsChanged", function(logEntries) {
         return ctx.querySelector(".badges");
     }
 
-    function isChecklistCompleteBadge(node) {
-        return node.classList.contains("is-complete");
-    }
-
-    function isDueDatePastBadge(node) {
-        var cList = node.classList;
-        return cList.contains("is-due-now") || cList.contains("is-due-past");
-    }
-
     function getTimerBadgeNode(ctx) {
         return ctx.querySelector(".timer-badge");
     }
@@ -249,14 +231,6 @@ self.port.on("listsChanged", function(logEntries) {
 
     function getTimerBadgeEstimate(ctx) {
         return ctx.querySelector(".badge-text-estimate");
-    }
-
-    function getChecklistIconNode(ctx) {
-        return ctx.querySelector(".icon-checklist");
-    }
-
-    function getDueDateIconNode(ctx) {
-        return ctx.querySelector(".icon-calendar");
     }
 
 })(this);

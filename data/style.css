@@ -26,6 +26,7 @@
 .tt-card-complete .timer-badge,
 .tt-card-complete .timer-badge span,
 .tt-card-complete .is-due-now,
+.tt-card-complete .is-due-complete,
 .tt-card-complete .is-due-past {
     background-color: #61bd4f;
     border-radius: 3px;

@@ -59,11 +59,10 @@ Default is *false*
 
 ### Enable completed cards
 Changes display options for completed cards. Completed card is a card that has
-a completed checklist and a due date in the past. If these conditions are met,
-the timer badge will only show the total time spent and both timer badge and
-due date badge will get a green background.  
-If the given lists contains completed cards only, the list header will display
-the total time spent.  
+a Due Date checkbox checked. If this condition is met, the timer badge will
+only show the total time spent and will get a green background. If the given
+list contains completed cards only, the list header will display the total
+time spent.
 Default is *false*
 
 ![card list](img/complete.png)
