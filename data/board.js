@@ -33,7 +33,6 @@ self.port.on("listsChanged", function(logEntries) {
             let map = getCardsMap(lists[i]);
             map.forEach(function(cardNode, cardId) {
                 addTimerBadges(cardNode, cardsData[cardId]);
-                toggleCalendarIcons(cardNode);
                 toggleDescBadge(cardNode);
                 toggleCommentsBadge(cardNode);
                 toggleCompletedCard(cardNode);
@@ -160,15 +159,6 @@ self.port.on("listsChanged", function(logEntries) {
         badgesNode.insertBefore(badgeNode, badgesNode.childNodes[index]);
     }
 
-    function toggleCalendarIcons(cardNode) {
-        var icons = getClockIconNodes(cardNode);
-        for (let i = 0; i < icons.length; i++) {
-            if (!isTimerBadge(icons[i].parentNode)) {
-                swapIcons(icons[i].parentNode);
-            }
-        }
-    }
-
     function toggleDescBadge(cardNode) {
         var icon = getDescIconNode(cardNode);
         toggleBadgeVisibility(icon, "hide_desc_badge");
@@ -257,10 +247,6 @@ self.port.on("listsChanged", function(logEntries) {
         return ctx.querySelector(".badges");
     }
 
-    function isTimerBadge(node) {
-        return node.classList.contains("timer-badge");
-    }
-
     function isChecklistCompleteBadge(node) {
         return node.classList.contains("is-complete");
     }
@@ -284,10 +270,6 @@ self.port.on("listsChanged", function(logEntries) {
 
     function getTimerBadgeEstimate(ctx) {
         return ctx.querySelector(".badge-text-estimate");
-    }
-
-    function getClockIconNodes(ctx) {
-        return ctx.querySelectorAll(".icon-clock");
     }
 
     function getDescIconNode(ctx) {

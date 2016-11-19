@@ -1,6 +1,6 @@
 const CLOCK_ICON = (function() {
     var icon = document.createElement("span");
-    icon.classList.add("icon-sm", "icon-clock");
+    icon.classList.add("icon-sm", "icon-clock2");
     return icon;
 })();
 
@@ -83,11 +83,5 @@ function emptyNode(node) {
     while (node.firstChild) {
         node.removeChild(node.firstChild);
     }
-}
-
-function swapIcons(node) {
-    var calendar = node.querySelector(".icon-clock");
-    calendar.classList.remove("icon-clock");
-    calendar.classList.add("icon-calendar");
 }
 

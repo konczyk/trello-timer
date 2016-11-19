@@ -25,7 +25,6 @@ self.port.on("cardChanged", function(data) {
         setCardId();
         self.port.emit("cardReady", {"cardId": cardId});
         setTrackButton();
-        swapIcons(document.querySelector(".window-wrapper .window-sidebar"));
         trackStart = null;
         if (trackInterval !== null) {
             clearInterval(trackInterval);

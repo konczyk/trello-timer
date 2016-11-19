@@ -84,3 +84,12 @@
 .badge-text-estimate {
     color: #fe8402;
 }
+
+/* swap icons clock -> calendar, clock2 -> clock */
+.icon-clock:before {
+  content:"\e90b"
+}
+
+.icon-clock2:before {
+  content:"\e914"
+}
