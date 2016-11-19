@@ -39,18 +39,6 @@
       "title": "Enable completed cards",
       "type": "bool",
       "value": false
-    },
-    {
-      "name": "hide_desc_badge",
-      "title": "Hide description icon",
-      "type": "bool",
-      "value": false
-    },
-    {
-      "name": "hide_comment_badge",
-      "title": "Hide comment icon",
-      "type": "bool",
-      "value": false
     }
   ]
 }

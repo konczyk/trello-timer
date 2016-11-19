@@ -12,8 +12,6 @@ self.port.on("listsChanged", function(logEntries) {
 
     var options = {
         "timer_badge_position": self.options.timer_badge_position,
-        "hide_desc_badge": self.options.hide_desc_badge,
-        "hide_comment_badge": self.options.hide_comment_badge,
         "enable_completed_card": self.options.enable_completed_card
     },
     cardRe = new RegExp(/^\/c\/([A-Za-z0-9]{8,})\/.*$/);
@@ -33,8 +31,6 @@ self.port.on("listsChanged", function(logEntries) {
             let map = getCardsMap(lists[i]);
             map.forEach(function(cardNode, cardId) {
                 addTimerBadges(cardNode, cardsData[cardId]);
-                toggleDescBadge(cardNode);
-                toggleCommentsBadge(cardNode);
                 toggleCompletedCard(cardNode);
             });
             let header = getListHeaderNode(lists[i]);
@@ -159,23 +155,6 @@ self.port.on("listsChanged", function(logEntries) {
         badgesNode.insertBefore(badgeNode, badgesNode.childNodes[index]);
     }
 
-    function toggleDescBadge(cardNode) {
-        var icon = getDescIconNode(cardNode);
-        toggleBadgeVisibility(icon, "hide_desc_badge");
-    }
-
-    function toggleCommentsBadge(cardNode) {
-        var icon = getCommentsIconNode(cardNode);
-        toggleBadgeVisibility(icon, "hide_comment_badge");
-    }
-
-    function toggleBadgeVisibility(icon, opt) {
-        if (icon) {
-            var classList = icon.parentNode.classList;
-            classList.toggle("tt-hide", options[opt]);
-        }
-    }
-
     function toggleCompletedCard(cardNode) {
         let enabled = options.enable_completed_card,
             checkIcon = getChecklistIconNode(cardNode),
@@ -272,20 +251,12 @@ self.port.on("listsChanged", function(logEntries) {
         return ctx.querySelector(".badge-text-estimate");
     }
 
-    function getDescIconNode(ctx) {
-        return ctx.querySelector(".icon-description");
-    }
-
     function getChecklistIconNode(ctx) {
         return ctx.querySelector(".icon-checklist");
     }
 
     function getDueDateIconNode(ctx) {
         return ctx.querySelector(".icon-calendar");
-    }
-
-    function getCommentsIconNode(ctx) {
-        return ctx.querySelector(".icon-comment");
     }
 
 })(this);

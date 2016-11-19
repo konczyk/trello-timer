@@ -68,14 +68,6 @@ Default is *false*
 
 ![card list](img/complete.png)
 
-### Hide description icon
-Hides description icon in the list view.  
-Default is *false*
-
-### Hide comment icon
-Hides comments icon in the list view.  
-Default is *false*
-
 ## Installation
 
 At the moment you can install it only manually by first building it with jpm
